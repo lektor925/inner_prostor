@@ -1,0 +1,118 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Заявка на новую позицию{% endblock %}
+
+{% block content %}
+<form class="request-form" method="post" id="request-form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <p>{{ form.description.label_tag }} {{ form.description }} {{ form.description.errors }}</p>
+    <p>{{ form.guessed_kind.label_tag }} {{ form.guessed_kind }} {{ form.guessed_kind.errors }}</p>
+    <p>{{ form.unit.label_tag }} {{ form.unit }} {{ form.unit.errors }}</p>
+    <p>{{ form.gost_or_article.label_tag }} {{ form.gost_or_article }} {{ form.gost_or_article.errors }}</p>
+    <p>{{ form.analog_url.label_tag }} {{ form.analog_url }} {{ form.analog_url.errors }}</p>
+
+    <div class="similar-candidates" id="similar-candidates" hidden>
+        <p>Похожие позиции уже есть в справочнике — отметьте каждую (ADR-007):</p>
+        <ul id="similar-candidates-list"></ul>
+    </div>
+
+    {{ form.shown_candidate_ids }}
+    {{ form.similar_to }}
+    <div id="reviewed-not-matching-inputs"></div>
+
+    <button type="submit">Отправить заявку</button>
+</form>
+
+<script>
+(function () {
+    var descriptionInput = document.getElementById('id_description');
+    var candidatesBox = document.getElementById('similar-candidates');
+    var candidatesList = document.getElementById('similar-candidates-list');
+    var shownField = document.getElementById('id_shown_candidate_ids');
+    var similarToField = document.getElementById('id_similar_to');
+    var reviewedContainer = document.getElementById('reviewed-not-matching-inputs');
+    var debounceTimer = null;
+    var reviewedIds = new Set();
+
+    function updateReviewedInputs() {
+        reviewedContainer.innerHTML = '';
+        reviewedIds.forEach(function (id) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'reviewed_not_matching';
+            input.value = id;
+            reviewedContainer.appendChild(input);
+        });
+    }
+
+    function renderCandidates(results) {
+        candidatesList.innerHTML = '';
+        shownField.value = results.map(function (r) { return r.id; }).join(',');
+        reviewedIds = new Set();
+        similarToField.value = '';
+        updateReviewedInputs();
+
+        if (!results.length) {
+            candidatesBox.hidden = true;
+            return;
+        }
+        candidatesBox.hidden = false;
+
+        results.forEach(function (item) {
+            var li = document.createElement('li');
+            li.className = 'similar-candidate';
+
+            var text = document.createElement('span');
+            text.textContent = item.name + (item.article ? ' (' + item.article + ')' : '');
+            li.appendChild(text);
+
+            var matchLabel = document.createElement('label');
+            var matchRadio = document.createElement('input');
+            matchRadio.type = 'radio';
+            matchRadio.name = 'similar-decision-' + item.id;
+            matchRadio.addEventListener('change', function () {
+                similarToField.value = item.id;
+                reviewedIds.delete(item.id);
+                updateReviewedInputs();
+            });
+            matchLabel.appendChild(matchRadio);
+            matchLabel.appendChild(document.createTextNode('да, это оно'));
+
+            var noMatchLabel = document.createElement('label');
+            var noMatchRadio = document.createElement('input');
+            noMatchRadio.type = 'radio';
+            noMatchRadio.name = 'similar-decision-' + item.id;
+            noMatchRadio.addEventListener('change', function () {
+                if (similarToField.value === String(item.id)) {
+                    similarToField.value = '';
+                }
+                reviewedIds.add(item.id);
+                updateReviewedInputs();
+            });
+            noMatchLabel.appendChild(noMatchRadio);
+            noMatchLabel.appendChild(document.createTextNode('просмотрел, не подходит'));
+
+            li.appendChild(matchLabel);
+            li.appendChild(noMatchLabel);
+            candidatesList.appendChild(li);
+        });
+    }
+
+    descriptionInput.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        var query = descriptionInput.value.trim();
+        if (!query) {
+            renderCandidates([]);
+            return;
+        }
+        debounceTimer = setTimeout(function () {
+            fetch('{% url "catalog:similar_nomenclature" %}?q=' + encodeURIComponent(query))
+                .then(function (response) { return response.json(); })
+                .then(function (data) { renderCandidates(data.results); });
+        }, 400);
+    });
+})();
+</script>
+{% endblock %}

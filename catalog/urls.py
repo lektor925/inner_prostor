@@ -11,4 +11,11 @@ urlpatterns = [
         views.NomenclatureDetailView.as_view(),
         name='nomenclature_detail',
     ),
+    path('requests/', views.RequestListView.as_view(), name='request_list'),
+    path('requests/new/', views.RequestCreateView.as_view(), name='request_create'),
+    path(
+        'requests/similar/',
+        views.similar_nomenclature,
+        name='similar_nomenclature',
+    ),
 ]

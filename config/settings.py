@@ -140,6 +140,12 @@ USE_TZ = True
 IMPORT_DIR = Path(os.environ.get('IMPORT_DIR', BASE_DIR / 'import'))
 
 
+# Аутентификация (ADR-011): локальные учётки Django, пользователей заводит
+# Владимир через админку. LOGIN_URL — стандартный django.contrib.auth.
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'catalog:nomenclature_list'
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 

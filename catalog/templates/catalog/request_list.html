@@ -1,0 +1,40 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Заявки на новые позиции{% endblock %}
+
+{% block content %}
+<form class="request-filter" method="get" action="{% url 'catalog:request_list' %}">
+    <label for="filter-status">Статус</label>
+    <select id="filter-status" name="status">
+        <option value="">Все</option>
+        {% for value, label in statuses %}
+        <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Применить</button>
+</form>
+
+<ul class="request-list">
+    {% for req in request_list %}
+    <li class="request-card">
+        <span class="request-card__status">{{ req.get_status_display }}</span>
+        <span class="request-card__author">{{ req.author }}</span>
+        <p>{{ req.description }}</p>
+    </li>
+    {% empty %}
+    <li>Заявок пока нет.</li>
+    {% endfor %}
+</ul>
+
+{% if page_obj.paginator.num_pages > 1 %}
+<nav class="pagination">
+    {% if page_obj.has_previous %}
+    <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}">← Назад</a>
+    {% endif %}
+    <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.next_page_number }}">Вперёд →</a>
+    {% endif %}
+</nav>
+{% endif %}
+{% endblock %}

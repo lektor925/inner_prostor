@@ -1,8 +1,19 @@
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from catalog.models import Folder, Nomenclature, NomenclatureKind, StockBalance, Warehouse
+from catalog.models import (
+    Folder,
+    Nomenclature,
+    NomenclatureKind,
+    Request,
+    StockBalance,
+    Warehouse,
+)
+from catalog.forms import RequestForm
 from catalog.views import NomenclatureListView, folders_by_hierarchy
+
+User = get_user_model()
 
 
 class NomenclatureListViewTests(TestCase):
@@ -212,3 +223,217 @@ class FoldersByHierarchyTests(TestCase):
                 (child_b.id, 1),
             ],
         )
+
+
+class RequestListViewTests(TestCase):
+    def test_anonymous_redirected_to_login(self):
+        response = self.client.get(reverse('catalog:request_list'))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/accounts/login/', response.url)
+
+    def test_shows_requests_from_all_authors(self):
+        alice = User.objects.create_user('alice')
+        bob = User.objects.create_user('bob')
+        Request.objects.create(author=alice, description='Нужен уголок 50x50')
+        Request.objects.create(author=bob, description='Нужна труба 20x20')
+
+        self.client.force_login(alice)
+        response = self.client.get(reverse('catalog:request_list'))
+
+        self.assertContains(response, 'Нужен уголок 50x50')
+        self.assertContains(response, 'Нужна труба 20x20')
+
+    def test_filters_by_status(self):
+        alice = User.objects.create_user('alice')
+        Request.objects.create(
+            author=alice, description='Новая заявка', status=Request.Status.NEW,
+        )
+        Request.objects.create(
+            author=alice, description='Закрытая заявка', status=Request.Status.CLOSED,
+        )
+
+        self.client.force_login(alice)
+        response = self.client.get(
+            reverse('catalog:request_list'), {'status': Request.Status.NEW}
+        )
+
+        self.assertContains(response, 'Новая заявка')
+        self.assertNotContains(response, 'Закрытая заявка')
+
+    def test_ignores_invalid_status_param(self):
+        alice = User.objects.create_user('alice')
+        Request.objects.create(author=alice, description='Заявка без статуса')
+
+        self.client.force_login(alice)
+        response = self.client.get(
+            reverse('catalog:request_list'), {'status': 'not-a-real-status'}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Заявка без статуса')
+
+    def test_paginates_results(self):
+        alice = User.objects.create_user('alice')
+        for i in range(51):
+            Request.objects.create(author=alice, description=f'Заявка {i:03d}')
+
+        self.client.force_login(alice)
+        page1 = self.client.get(reverse('catalog:request_list'))
+        page2 = self.client.get(reverse('catalog:request_list'), {'page': 2})
+
+        self.assertEqual(len(page1.context['request_list']), 50)
+        self.assertEqual(len(page2.context['request_list']), 1)
+        self.assertContains(page1, 'Вперёд')
+
+
+class RequestFormTests(TestCase):
+    def test_valid_without_shown_candidates(self):
+        form = RequestForm(data={'description': 'Нужен уголок 50x50'})
+
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_accepts_structural_fields(self):
+        kind = NomenclatureKind.objects.create(code_1c='k1', name='Крепёж')
+
+        form = RequestForm(data={
+            'description': 'Нужен уголок 50x50',
+            'guessed_kind': kind.id,
+            'unit': 'шт',
+            'gost_or_article': 'ГОСТ 8509-93',
+            'analog_url': 'https://example.com/item',
+        })
+
+        self.assertTrue(form.is_valid(), form.errors)
+        saved = form.save(commit=False)
+        self.assertEqual(saved.guessed_kind_id, kind.id)
+        self.assertEqual(saved.unit, 'шт')
+        self.assertEqual(saved.gost_or_article, 'ГОСТ 8509-93')
+        self.assertEqual(saved.analog_url, 'https://example.com/item')
+
+    def test_rejects_shown_candidate_not_marked(self):
+        candidate = Nomenclature.objects.create(code_1c='1', name='Уголок 50x50')
+
+        form = RequestForm(data={
+            'description': 'Нужен уголок 50x50',
+            'shown_candidate_ids': str(candidate.id),
+        })
+
+        self.assertFalse(form.is_valid())
+
+    def test_accepts_when_shown_candidate_marked_not_matching(self):
+        candidate = Nomenclature.objects.create(code_1c='1', name='Уголок 50x50')
+
+        form = RequestForm(data={
+            'description': 'Нужен уголок 50x50',
+            'shown_candidate_ids': str(candidate.id),
+            'reviewed_not_matching': [candidate.id],
+        })
+
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_accepts_when_shown_candidate_marked_as_similar_to(self):
+        candidate = Nomenclature.objects.create(code_1c='1', name='Уголок 50x50')
+
+        form = RequestForm(data={
+            'description': 'Нужен уголок 50x50',
+            'shown_candidate_ids': str(candidate.id),
+            'similar_to': candidate.id,
+        })
+
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_accepts_candidate_marked_both_similar_to_and_reviewed(self):
+        candidate = Nomenclature.objects.create(code_1c='1', name='Уголок 50x50')
+
+        form = RequestForm(data={
+            'description': 'Нужен уголок 50x50',
+            'shown_candidate_ids': str(candidate.id),
+            'similar_to': candidate.id,
+            'reviewed_not_matching': [candidate.id],
+        })
+
+        self.assertTrue(form.is_valid(), form.errors)
+
+
+class RequestCreateViewTests(TestCase):
+    def test_anonymous_redirected_to_login(self):
+        response = self.client.get(reverse('catalog:request_create'))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/accounts/login/', response.url)
+
+    def test_authenticated_user_sees_form(self):
+        alice = User.objects.create_user('alice')
+        self.client.force_login(alice)
+
+        response = self.client.get(reverse('catalog:request_create'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<form')
+
+    def test_creates_request_with_current_user_as_author(self):
+        alice = User.objects.create_user('alice')
+        self.client.force_login(alice)
+
+        response = self.client.post(
+            reverse('catalog:request_create'),
+            {'description': 'Нужен уголок 50x50'},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        created = Request.objects.get()
+        self.assertEqual(created.author, alice)
+        self.assertEqual(created.description, 'Нужен уголок 50x50')
+
+    def test_ignores_spoofed_author_and_status_in_post(self):
+        alice = User.objects.create_user('alice')
+        mallory = User.objects.create_user('mallory')
+        self.client.force_login(alice)
+
+        self.client.post(
+            reverse('catalog:request_create'),
+            {
+                'description': 'Нужен уголок 50x50',
+                'author': mallory.id,
+                'status': Request.Status.APPROVED,
+            },
+        )
+
+        created = Request.objects.get()
+        self.assertEqual(created.author, alice)
+        self.assertEqual(created.status, Request.Status.NEW)
+
+
+class SimilarNomenclatureViewTests(TestCase):
+    def test_anonymous_redirected_to_login(self):
+        response = self.client.get(reverse('catalog:similar_nomenclature'), {'q': 'болт'})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/accounts/login/', response.url)
+
+    def test_returns_matching_names_as_json(self):
+        alice = User.objects.create_user('alice')
+        self.client.force_login(alice)
+        Nomenclature.objects.create(code_1c='1', name='Болт М10')
+        Nomenclature.objects.create(code_1c='2', name='Кабель ВВГ')
+
+        response = self.client.get(
+            reverse('catalog:similar_nomenclature'), {'q': 'болт'}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        names = [item['name'] for item in payload['results']]
+        self.assertIn('Болт М10', names)
+        self.assertNotIn('Кабель ВВГ', names)
+
+    def test_empty_query_returns_no_results(self):
+        alice = User.objects.create_user('alice')
+        self.client.force_login(alice)
+        Nomenclature.objects.create(code_1c='1', name='Болт М10')
+
+        response = self.client.get(reverse('catalog:similar_nomenclature'), {'q': ''})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'results': []})
