@@ -135,6 +135,11 @@ USE_I18N = True
 USE_TZ = True
 
 
+# Импорт из 1С (ADR-009): папка, куда 1С кладёт файлы выгрузки (на MVP —
+# локальная папка, т.к. Django и сервер 1С на одной машине, ADR-020).
+IMPORT_DIR = Path(os.environ.get('IMPORT_DIR', BASE_DIR / 'import'))
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
