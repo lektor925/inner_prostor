@@ -1,4 +1,7 @@
+import unittest
+
 from django.contrib.auth import get_user_model
+from django.db import connection
 from django.test import TestCase
 from django.urls import reverse
 
@@ -437,3 +440,45 @@ class SimilarNomenclatureViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'results': []})
+
+
+@unittest.skipUnless(
+    connection.vendor == 'postgresql',
+    'требует реальный Postgres (pg_trgm/FTS) — недоступен на sqlite',
+)
+class PostgresSearchTests(TestCase):
+    """
+    Тесты, проверяющие сам Postgres-путь поиска (ADR-006/ADR-007) — ту
+    часть, которую sqlite-фолбэк не покрывает вообще. Раньше это было
+    задокументированным пробелом; теперь, когда Postgres доступен в среде
+    разработки, эти тесты реально гоняются и ловят регрессии в реальном
+    FTS/pg_trgm поведении (см. коммит, где ts_rank давал ложный >0 при
+    отсутствии совпадения — этот класс существует, чтобы больше не
+    полагаться на ручную проверку такого рода).
+    """
+
+    def test_garbage_query_finds_nothing(self):
+        Nomenclature.objects.create(code_1c='1', name='Болт М10')
+
+        response = self.client.get(
+            reverse('catalog:nomenclature_list'),
+            {'q': 'совершенно случайный несуществующий набор слов'},
+        )
+
+        self.assertContains(response, 'Ничего не найдено.')
+
+    def test_typo_matches_long_full_name(self):
+        # Триграммное сходство короткого запроса с длинным полным именем
+        # занижается обычной similarity() из-за разницы в длине строк —
+        # нужен TrigramWordSimilarity, не TrigramSimilarity.
+        Nomenclature.objects.create(
+            code_1c='1', name='Болт М10 оцинкованный увеличенной прочности',
+        )
+        self.client.force_login(User.objects.create_user('alice'))
+
+        response = self.client.get(
+            reverse('catalog:similar_nomenclature'), {'q': 'болд м10'}
+        )
+
+        names = [item['name'] for item in response.json()['results']]
+        self.assertIn('Болт М10 оцинкованный увеличенной прочности', names)

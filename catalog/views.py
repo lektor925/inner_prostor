@@ -118,18 +118,27 @@ class NomenclatureListView(ListView):
             SearchQuery,
             SearchRank,
             SearchVector,
-            TrigramSimilarity,
+            TrigramWordSimilarity,
         )
 
         vector = SearchVector('name', 'article', config='russian')
         search_query = SearchQuery(query, config='russian')
 
+        # ts_rank даёт исчезающе малое, но не строго нулевое значение
+        # (~1e-20) даже без реального совпадения — фильтр по rank__gt=0
+        # пропускал бы вообще любой запрос. Проверять совпадение нужно
+        # самим оператором `@@` (Q(search=search_query)), rank — только
+        # для сортировки найденного. TrigramWordSimilarity (не обычная
+        # TrigramSimilarity) — иначе короткий запрос против длинного
+        # полного наименования занижается разницей в длине строк, см.
+        # similar_nomenclature ниже про ту же причину.
         return (
             qs.annotate(
+                search=vector,
                 rank=SearchRank(vector, search_query),
-                similarity=TrigramSimilarity('name', query),
+                similarity=TrigramWordSimilarity(query, 'name'),
             )
-            .filter(Q(rank__gt=0) | Q(similarity__gt=0.2))
+            .filter(Q(search=search_query) | Q(similarity__gt=0.2))
             .order_by('-rank', '-similarity')
         )
 
@@ -206,10 +215,16 @@ def similar_nomenclature(request):
     active = Nomenclature.objects.filter(is_active=True)
 
     if connection.vendor == 'postgresql':
-        from django.contrib.postgres.search import TrigramSimilarity
+        from django.contrib.postgres.search import TrigramWordSimilarity
 
+        # TrigramWordSimilarity, а не TrigramSimilarity: обычная similarity()
+        # занижает сходство короткого запроса с длинным полным наименованием
+        # из-за разницы в длине строк (доля общих триграмм от общего числа) —
+        # что срезает именно те опечатки, которые ADR-007 просит ловить.
+        # word_similarity ищет наилучшее совпадение внутри строки, не
+        # штрафуя за «хвост» после совпавшей части.
         matches = list(
-            active.annotate(similarity=TrigramSimilarity('name', query))
+            active.annotate(similarity=TrigramWordSimilarity(query, 'name'))
             .filter(similarity__gt=0.2)
             .order_by('-similarity')[:10]
         )
