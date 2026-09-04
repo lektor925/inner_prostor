@@ -1,0 +1,75 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Поиск номенклатуры{% endblock %}
+
+{% block content %}
+<form class="search-bar" method="get" action="{% url 'catalog:nomenclature_list' %}">
+    <input type="text" name="q" value="{{ current.q }}" placeholder="Название или артикул…">
+
+    <div class="facets">
+        <div class="facets__group">
+            <label for="facet-kind">Вид номенклатуры</label>
+            <select id="facet-kind" name="kind">
+                <option value="">Все</option>
+                {% for kind in kinds %}
+                <option value="{{ kind.id }}" {% if current.kind == kind.id|stringformat:'s' %}selected{% endif %}>
+                    {{ kind.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="facets__group">
+            <label for="facet-folder">Папка</label>
+            <select id="facet-folder" name="folder">
+                <option value="">Все</option>
+                {% for folder, label in folders %}
+                <option value="{{ folder.id }}" {% if current.folder == folder.id|stringformat:'s' %}selected{% endif %}>
+                    {{ label }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="facets__group">
+            <label>
+                <input type="checkbox" name="stale" value="1" {% if current.stale %}checked{% endif %}>
+                Только залежавшееся
+            </label>
+        </div>
+
+        <div class="facets__group">
+            <label>
+                <input type="checkbox" name="in_stock" value="1" {% if current.in_stock %}checked{% endif %}>
+                Есть в наличии
+            </label>
+        </div>
+    </div>
+
+    <button type="submit">Найти</button>
+</form>
+
+<ul class="nomenclature-list">
+    {% for item in nomenclature_list %}
+    <li class="nomenclature-card">
+        <a href="{% url 'catalog:nomenclature_detail' item.code_1c %}">{{ item.name }}</a>
+        {% if item.article %}<span class="nomenclature-card__article">{{ item.article }}</span>{% endif %}
+        {% if item.is_stale %}<span class="badge badge--stale">залежалось</span>{% endif %}
+    </li>
+    {% empty %}
+    <li>Ничего не найдено.</li>
+    {% endfor %}
+</ul>
+
+{% if page_obj.paginator.num_pages > 1 %}
+<nav class="pagination">
+    {% if page_obj.has_previous %}
+    <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}">← Назад</a>
+    {% endif %}
+    <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.next_page_number }}">Вперёд →</a>
+    {% endif %}
+</nav>
+{% endif %}
+{% endblock %}

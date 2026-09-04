@@ -126,8 +126,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'ru-ru'
 
-# TODO: подставить реальный часовой пояс предприятия (влияет на время
-# ночного импорта в ADR-009). Europe/Moscow — плейсхолдер, не подтверждён.
+# Часовой пояс предприятия подтверждён (влияет на время ночного импорта
+# в ADR-009): Europe/Moscow.
 TIME_ZONE = os.environ.get('DJANGO_TIME_ZONE', 'Europe/Moscow')
 
 USE_I18N = True

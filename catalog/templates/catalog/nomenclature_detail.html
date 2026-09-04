@@ -1,0 +1,42 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}{{ nomenclature.name }}{% endblock %}
+
+{% block content %}
+<article class="nomenclature-detail">
+    {% if not nomenclature.is_active %}
+    <p class="badge badge--inactive">не актуально — позиция помечена на удаление в 1С</p>
+    {% endif %}
+
+    <h1>{{ nomenclature.name }}</h1>
+    <dl class="nomenclature-detail__attrs">
+        <dt>Артикул</dt><dd>{{ nomenclature.article|default:'—' }}</dd>
+        <dt>Единица измерения</dt><dd>{{ nomenclature.base_unit|default:'—' }}</dd>
+        <dt>Вид номенклатуры</dt><dd>{{ nomenclature.kind|default:'—' }}</dd>
+        <dt>Папка</dt><dd>{{ nomenclature.folder|default:'—' }}</dd>
+        <dt>Доступно суммарно</dt>
+        <dd>
+            {{ nomenclature.total_available }}
+            {% if nomenclature.is_stale %}<span class="badge badge--stale">залежалось</span>{% endif %}
+        </dd>
+    </dl>
+
+    <table class="stock-table">
+        <thead>
+            <tr><th>Склад</th><th>Остаток</th><th>В резерве</th><th>Доступно</th></tr>
+        </thead>
+        <tbody>
+            {% for balance in nomenclature.stock_balances.all %}
+            <tr>
+                <td>{{ balance.warehouse.name }}</td>
+                <td>{{ balance.qty }}</td>
+                <td>{{ balance.reserved }}</td>
+                <td>{{ balance.available }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">Остатков нет.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</article>
+{% endblock %}
