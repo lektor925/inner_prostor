@@ -1,75 +1,124 @@
 {% extends 'catalog/base.html' %}
 
-{% block title %}Поиск номенклатуры{% endblock %}
+{% block title %}Номенклатура{% endblock %}
 
 {% block content %}
-<form class="search-bar" method="get" action="{% url 'catalog:nomenclature_list' %}">
-    <input type="text" name="q" value="{{ current.q }}" placeholder="Название или артикул…">
+<div class="prostor-container prostor-container--app prostor-page">
+    <nav class="prostor-breadcrumbs">
+        <a href="{% url 'catalog:home' %}">Главная</a>
+        <span class="prostor-breadcrumbs__sep">/</span>
+        <span aria-current="page">Номенклатура</span>
+    </nav>
 
-    <div class="facets">
-        <div class="facets__group">
-            <label for="facet-kind">Вид номенклатуры</label>
-            <select id="facet-kind" name="kind">
-                <option value="">Все</option>
-                {% for kind in kinds %}
-                <option value="{{ kind.id }}" {% if current.kind == kind.id|stringformat:'s' %}selected{% endif %}>
-                    {{ kind.name }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="facets__group">
-            <label for="facet-folder">Папка</label>
-            <select id="facet-folder" name="folder">
-                <option value="">Все</option>
-                {% for folder, label in folders %}
-                <option value="{{ folder.id }}" {% if current.folder == folder.id|stringformat:'s' %}selected{% endif %}>
-                    {{ label }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="facets__group">
-            <label>
-                <input type="checkbox" name="stale" value="1" {% if current.stale %}checked{% endif %}>
-                Только залежавшееся
-            </label>
-        </div>
-
-        <div class="facets__group">
-            <label>
-                <input type="checkbox" name="in_stock" value="1" {% if current.in_stock %}checked{% endif %}>
-                Есть в наличии
-            </label>
-        </div>
+    <div class="prostor-section-heading">
+        <span class="prostor-section-heading__rule"></span>
+        <p class="prostor-section-heading__eyebrow">Справочник</p>
+        <h1 class="prostor-section-heading__title">Номенклатура</h1>
+        <p class="prostor-section-heading__description">Данные обновляются синхронизацией с 1С.</p>
     </div>
 
-    <button type="submit">Найти</button>
-</form>
+    <form method="get" action="{% url 'catalog:nomenclature_list' %}">
+        <div class="nl-layout">
+            <aside class="nl-facets">
+                <div>
+                    <p class="nl-facet-title">Вид номенклатуры</p>
+                    <select class="prostor-control" id="facet-kind" name="kind">
+                        <option value="">Все</option>
+                        {% for kind in kinds %}
+                        <option value="{{ kind.id }}" {% if current.kind == kind.id|stringformat:'s' %}selected{% endif %}>{{ kind.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-<ul class="nomenclature-list">
-    {% for item in nomenclature_list %}
-    <li class="nomenclature-card">
-        <a href="{% url 'catalog:nomenclature_detail' item.code_1c %}">{{ item.name }}</a>
-        {% if item.article %}<span class="nomenclature-card__article">{{ item.article }}</span>{% endif %}
-        {% if item.is_stale %}<span class="badge badge--stale">залежалось</span>{% endif %}
-    </li>
-    {% empty %}
-    <li>Ничего не найдено.</li>
-    {% endfor %}
-</ul>
+                <div>
+                    <p class="nl-facet-title">Папка</p>
+                    <select class="prostor-control" id="facet-folder" name="folder">
+                        <option value="">Все</option>
+                        {% for folder, label in folders %}
+                        <option value="{{ folder.id }}" {% if current.folder == folder.id|stringformat:'s' %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-{% if page_obj.paginator.num_pages > 1 %}
-<nav class="pagination">
-    {% if page_obj.has_previous %}
-    <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}">← Назад</a>
-    {% endif %}
-    <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
-    {% if page_obj.has_next %}
-    <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.next_page_number }}">Вперёд →</a>
-    {% endif %}
-</nav>
-{% endif %}
+                <div class="nl-facet-group">
+                    <p class="nl-facet-title">Остаток</p>
+                    <label class="prostor-checkbox">
+                        <input type="checkbox" name="stale" value="1" {% if current.stale %}checked{% endif %}>
+                        Только залежавшееся
+                    </label>
+                    <label class="prostor-checkbox">
+                        <input type="checkbox" name="in_stock" value="1" {% if current.in_stock %}checked{% endif %}>
+                        Есть в наличии
+                    </label>
+                </div>
+
+                <button type="submit" class="prostor-btn prostor-btn--primary prostor-btn--sm" style="align-self:flex-start">Найти</button>
+            </aside>
+
+            <div class="nl-main">
+                <div class="nl-toolbar prostor-field">
+                    <label class="prostor-field__label" for="nl-q">Поиск по справочнику</label>
+                    <input class="prostor-control" type="text" id="nl-q" name="q" value="{{ current.q }}"
+                           placeholder="Например: компрессор GEA или 12-0431" autocomplete="off">
+                    <p class="prostor-field__hint">По наименованию или артикулу, опечатки допустимы</p>
+                </div>
+
+                {% if nomenclature_list %}
+                <p class="nl-count">Показано {{ nomenclature_list|length }} из {{ page_obj.paginator.count }}</p>
+                <div class="prostor-table-wrap">
+                    <table class="prostor-table prostor-table--rows">
+                        <thead>
+                            <tr>
+                                <th>Наименование</th>
+                                <th class="prostor-table__mono">Артикул</th>
+                                <th>Вид</th>
+                                <th>Папка</th>
+                                <th class="prostor-table__end prostor-table__mono">Доступно</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in nomenclature_list %}
+                            <tr onclick="location.href='{% url 'catalog:nomenclature_detail' item.code_1c %}'">
+                                <td><a href="{% url 'catalog:nomenclature_detail' item.code_1c %}">{{ item.name }}</a></td>
+                                <td class="prostor-table__mono">{{ item.article|default:'—' }}</td>
+                                <td>{{ item.kind|default:'—' }}</td>
+                                <td>{{ item.folder|default:'—' }}</td>
+                                <td class="prostor-table__end prostor-table__mono">{{ item.total_available|floatformat:'-3' }}</td>
+                                <td>
+                                    {% if item.is_stale %}
+                                    <span class="prostor-badge prostor-badge--warning"><span class="prostor-badge__dot"></span>Залежалось</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if page_obj.paginator.num_pages > 1 %}
+                <nav class="prostor-pagination">
+                    {% if page_obj.has_previous %}
+                    <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}">← Назад</a>
+                    {% endif %}
+                    <span class="prostor-pagination__status">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+                    {% if page_obj.has_next %}
+                    <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.next_page_number }}">Вперёд →</a>
+                    {% endif %}
+                </nav>
+                {% endif %}
+
+                {% else %}
+                <div class="prostor-empty">
+                    <h3 class="prostor-empty__title">Ничего не найдено.</h3>
+                    <p class="prostor-empty__description">Проверьте, что позиция действительно отсутствует в справочнике, прежде чем подавать заявку.</p>
+                    <div class="prostor-empty__action">
+                        <a href="{% url 'catalog:request_create' %}" class="prostor-btn prostor-btn--primary prostor-btn--sm">Оставить заявку на новую позицию</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+</div>
 {% endblock %}

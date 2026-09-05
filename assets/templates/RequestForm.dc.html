@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700&family=Arimo:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+:root{
+--prostor-red-500:#FF0000;--prostor-red-600:#D60000;--prostor-red-700:#B00000;
+--prostor-grey-900:#212121;--prostor-grey-700:#55585C;--prostor-grey-500:#9E9D9F;--prostor-grey-300:#CFD2D3;--prostor-grey-200:#E4E6E7;--prostor-grey-100:#F6F6F6;--prostor-grey-050:#F3F5F6;--prostor-white:#FFFFFF;
+--prostor-green-600:#2E7D32;--prostor-green-050:#EAF3EA;
+--prostor-brand:var(--prostor-red-500);--prostor-brand-hover:var(--prostor-red-600);--prostor-brand-active:var(--prostor-red-700);
+--prostor-text-primary:var(--prostor-grey-700);--prostor-text-heading:var(--prostor-grey-900);--prostor-text-muted:var(--prostor-grey-500);--prostor-text-inverse:var(--prostor-white);
+--prostor-text-link:var(--prostor-grey-700);--prostor-text-link-hover:var(--prostor-red-500);
+--prostor-bg-page:var(--prostor-white);--prostor-bg-subtle:var(--prostor-grey-050);--prostor-bg-muted:var(--prostor-grey-100);
+--prostor-border-default:var(--prostor-grey-200);--prostor-border-strong:var(--prostor-grey-300);--prostor-border-focus:var(--prostor-red-500);
+--prostor-success:var(--prostor-green-600);--prostor-success-bg:var(--prostor-green-050);
+--prostor-focus-ring:0 0 0 2px rgba(255,0,0,.45);
+--prostor-font-display:"Archivo Expanded",Verdana,Arial,sans-serif;
+--prostor-font-body:"Arimo",Verdana,Arial,sans-serif;
+--prostor-font-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+--prostor-font-size-xl:36px;--prostor-font-size-sm:15px;--prostor-font-size-xs:13px;
+--prostor-line-height-heading:1.1;
+--prostor-letter-spacing-tight:.02em;--prostor-letter-spacing-normal:.03em;
+--prostor-space-3:12px;--prostor-space-4:16px;--prostor-space-6:24px;--prostor-space-8:32px;
+--prostor-container-reading:760px;--prostor-container-gutter:20px;--prostor-header-height:80px;--prostor-rule-width:30px;
+--prostor-radius-md:10px;--prostor-radius-full:9999px;--prostor-z-sticky:1100;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--prostor-bg-page);color:var(--prostor-text-primary);font-family:var(--prostor-font-body);letter-spacing:var(--prostor-letter-spacing-normal)}
+a{color:var(--prostor-text-link);text-decoration:underline}
+a:hover{color:var(--prostor-text-link-hover)}
+
+.prostor-topbar{background:var(--prostor-bg-subtle);border-bottom:1px solid var(--prostor-border-default)}
+.prostor-topbar--sticky{position:sticky;top:0;z-index:var(--prostor-z-sticky)}
+.prostor-topbar__inner{display:flex;align-items:center;gap:var(--prostor-space-8);height:var(--prostor-header-height);max-width:1400px;margin-inline:auto;padding-inline:var(--prostor-container-gutter)}
+.prostor-topbar__brand{display:flex;align-items:center;flex-shrink:0;gap:10px;font-family:var(--prostor-font-display);font-weight:700;letter-spacing:.06em;color:var(--prostor-text-heading);font-size:15px}
+.prostor-topbar__brand-mark{width:18px;height:18px;background:var(--prostor-brand);flex:none}
+.prostor-topbar__nav{display:flex;align-items:center;gap:24px;font-size:var(--prostor-font-size-sm)}
+.prostor-topbar__nav a{color:var(--prostor-text-primary);text-decoration:none}
+.prostor-topbar__nav a:hover,.prostor-topbar__nav a[aria-current="page"]{color:var(--prostor-brand)}
+.prostor-topbar__actions{display:flex;align-items:center;gap:12px;margin-left:auto}
+
+.prostor-container{width:100%;margin-inline:auto;padding-inline:var(--prostor-container-gutter)}
+.prostor-container--reading{max-width:var(--prostor-container-reading)}
+
+.prostor-breadcrumbs{display:flex;gap:8px;align-items:center;font-size:var(--prostor-font-size-sm);color:var(--prostor-text-muted)}
+
+.prostor-section-heading{margin-bottom:var(--prostor-space-6)}
+.prostor-section-heading__rule{display:block;width:var(--prostor-rule-width);height:3px;background:var(--prostor-brand);margin-bottom:var(--prostor-space-4)}
+.prostor-section-heading__eyebrow{margin:0 0 8px;font-size:var(--prostor-font-size-xs);letter-spacing:.08em;text-transform:uppercase;color:var(--prostor-text-muted)}
+.prostor-section-heading__title{margin:0;font-family:var(--prostor-font-display);font-weight:700;font-size:var(--prostor-font-size-xl);line-height:var(--prostor-line-height-heading);letter-spacing:var(--prostor-letter-spacing-tight);color:var(--prostor-text-heading)}
+
+.prostor-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;border-radius:var(--prostor-radius-md);font-family:var(--prostor-font-body);font-size:var(--prostor-font-size-sm);cursor:pointer}
+.prostor-btn--sm{padding:6px 12px}
+.prostor-btn--lg{padding:14px 28px;font-size:18px}
+.prostor-btn--ghost{background:transparent;color:var(--prostor-text-primary);border-color:transparent}
+.prostor-btn--ghost:hover{background:var(--prostor-bg-subtle)}
+.prostor-btn--secondary{background:var(--prostor-white);color:var(--prostor-text-heading);border-color:var(--prostor-border-strong);padding:6px 12px}
+.prostor-btn--secondary:hover{border-color:var(--prostor-text-primary)}
+.prostor-btn--primary{background:var(--prostor-brand);color:var(--prostor-text-inverse);padding:14px 28px;font-size:18px}
+.prostor-btn--primary:hover{background:var(--prostor-brand-hover)}
+.prostor-btn--primary[disabled]{opacity:.5;cursor:not-allowed}
+
+.prostor-card{background:var(--prostor-bg-page);border:1px solid var(--prostor-border-default);border-radius:var(--prostor-radius-md);padding:var(--prostor-space-8)}
+.prostor-card__title{margin:0 0 var(--prostor-space-4);font-family:var(--prostor-font-display);font-weight:700;font-size:21px;color:var(--prostor-text-heading)}
+
+.prostor-field__label{font-size:var(--prostor-font-size-sm);font-weight:700;font-family:var(--prostor-font-display);color:var(--prostor-text-heading);display:block;margin-bottom:8px}
+.prostor-field__hint{margin:4px 0 0;font-size:var(--prostor-font-size-xs);color:var(--prostor-text-muted)}
+.prostor-control{width:100%;font-family:var(--prostor-font-body);font-size:var(--prostor-font-size-sm);color:var(--prostor-text-heading);background:var(--prostor-bg-page);border:1px solid var(--prostor-border-strong);border-radius:var(--prostor-radius-md);padding:10px 12px}
+.prostor-control:focus{outline:none;border-color:var(--prostor-border-focus);box-shadow:var(--prostor-focus-ring)}
+textarea.prostor-control{resize:vertical;font-family:var(--prostor-font-body)}
+select.prostor-control{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2355585C' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+
+.prostor-badge{display:inline-flex;align-items:center;gap:8px;padding:2px 10px;border-radius:var(--prostor-radius-full);font-size:var(--prostor-font-size-xs);line-height:1.6;white-space:nowrap}
+.prostor-badge--success{color:var(--prostor-success);background:var(--prostor-success-bg)}
+.prostor-badge--neutral{color:var(--prostor-text-primary);background:var(--prostor-bg-muted)}
+
+.wiz-steps{display:flex;align-items:center;gap:10px;margin-bottom:32px}
+.wiz-step{display:flex;align-items:center;gap:10px}
+.wiz-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 13px var(--prostor-font-mono);border:1px solid var(--prostor-border-strong);color:var(--prostor-text-muted)}
+.wiz-num.done{background:var(--prostor-text-heading);color:#fff;border-color:var(--prostor-text-heading)}
+.wiz-num.current{border-color:var(--prostor-brand);color:var(--prostor-brand)}
+.wiz-label{font-size:var(--prostor-font-size-sm);color:var(--prostor-text-muted)}
+.wiz-label.current{color:var(--prostor-text-heading);font-weight:700}
+.wiz-line{width:56px;height:1px;background:var(--prostor-border-default)}
+.sim-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 0;border-bottom:1px solid var(--prostor-border-default)}
+.sim-info{display:flex;flex-direction:column;gap:2px}
+.sim-name{font:400 15px var(--prostor-font-body);color:var(--prostor-text-heading)}
+.sim-meta{font:400 13px var(--prostor-font-mono);color:var(--prostor-text-muted)}
+.sim-actions{display:flex;gap:8px;flex:none}
+</style>
+</helmet>
+
+<div>
+  <div class="prostor-topbar prostor-topbar--sticky">
+    <div class="prostor-topbar__inner">
+      <span class="prostor-topbar__brand"><span class="prostor-topbar__brand-mark"></span>PROSTOR</span>
+      <nav class="prostor-topbar__nav">
+        <a href="Home.dc.html">Главная</a>
+        <a href="NomenclatureList.dc.html">Номенклатура</a>
+        <a href="RequestsList.dc.html" aria-current="page">Мои заявки</a>
+      </nav>
+      <div class="prostor-topbar__actions">
+        <a href="Login.dc.html" class="prostor-btn prostor-btn--ghost">Выйти</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="prostor-container prostor-container--reading" style="padding-top:32px;padding-bottom:64px">
+    <div class="prostor-breadcrumbs"><a href="NomenclatureList.dc.html">Номенклатура</a><span>/</span><span>Заявка на новую позицию</span></div>
+    <div style="height:16px"></div>
+    <div class="prostor-section-heading">
+      <span class="prostor-section-heading__rule"></span>
+      <p class="prostor-section-heading__eyebrow">Номенклатура</p>
+      <h1 class="prostor-section-heading__title">Заявка на новую позицию</h1>
+    </div>
+
+    <div class="wiz-steps">
+      <div class="wiz-step"><span class="{{ step1Class }}">1</span><span class="{{ step1LabelClass }}">Похожие позиции</span></div>
+      <span class="wiz-line"></span>
+      <div class="wiz-step"><span class="{{ step2Class }}">2</span><span class="{{ step2LabelClass }}">Заявка</span></div>
+    </div>
+
+    <sc-if value="{{ isStep1 }}" hint-placeholder-val="{{ true }}">
+      <label class="prostor-field__label">Что вы ищете</label>
+      <input class="prostor-control" placeholder="Например: клапан обратный Ду50" value="{{ searchQuery }}" onChange="{{ setSearchQuery }}">
+      <p class="prostor-field__hint">Проверьте по названию или артикулу перед тем, как подавать заявку</p>
+
+      <div style="height:24px"></div>
+
+      <div class="prostor-card">
+        <p class="prostor-card__title">Похожие позиции в справочнике</p>
+        <sc-for list="{{ similarItems }}" as="it" hint-placeholder-count="3">
+          <div class="sim-row">
+            <div class="sim-info">
+              <span class="sim-name">{{ it.name }}</span>
+              <span class="sim-meta">{{ it.code }} · {{ it.folder }}</span>
+            </div>
+            <sc-if value="{{ it.showActions }}" hint-placeholder-val="{{ true }}">
+              <div class="sim-actions">
+                <button type="button" class="prostor-btn prostor-btn--secondary" onClick="{{ it.markMatch }}">Это оно</button>
+                <button type="button" class="prostor-btn prostor-btn--ghost prostor-btn--sm" onClick="{{ it.markSkip }}">Не подходит</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ it.showBadge }}" hint-placeholder-val="{{ false }}">
+              <span class="{{ it.badgeClass }}">{{ it.badgeLabel }}</span>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="height:28px"></div>
+
+      <sc-if value="{{ hasMatch }}" hint-placeholder-val="{{ false }}">
+        <button type="button" class="prostor-btn prostor-btn--primary" onClick="{{ goToDetail }}">Перейти к позиции</button>
+      </sc-if>
+      <sc-if value="{{ noMatch }}" hint-placeholder-val="{{ true }}">
+        <button type="button" class="prostor-btn prostor-btn--primary" disabled="{{ continueDisabled }}" onClick="{{ goToStep2 }}">Продолжить</button>
+      </sc-if>
+    </sc-if>
+
+    <sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
+      <form onSubmit="{{ handleSubmit }}" style="display:flex;flex-direction:column;gap:20px">
+        <div>
+          <label class="prostor-field__label">Что нужно и зачем</label>
+          <textarea class="prostor-control" rows="4" placeholder="Опишите деталь и для какого узла она нужна"></textarea>
+        </div>
+        <div>
+          <label class="prostor-field__label">Предполагаемый вид номенклатуры</label>
+          <select class="prostor-control">
+            <option value="">Не определено</option>
+            <option>Оборудование</option>
+            <option>Материалы</option>
+            <option>Комплектующие</option>
+            <option>Электрика</option>
+          </select>
+        </div>
+        <div>
+          <label class="prostor-field__label">Единица измерения</label>
+          <input class="prostor-control" placeholder="шт, м, кг…">
+        </div>
+        <div>
+          <label class="prostor-field__label">ГОСТ / артикул производителя</label>
+          <input class="prostor-control">
+          <p class="prostor-field__hint">Необязательно</p>
+        </div>
+        <div>
+          <label class="prostor-field__label">Ссылка на аналог у поставщика</label>
+          <input class="prostor-control" type="url" placeholder="https://">
+          <p class="prostor-field__hint">Необязательно</p>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:8px">
+          <button type="button" class="prostor-btn prostor-btn--ghost" style="padding:14px 28px" onClick="{{ backToStep1 }}">Назад</button>
+          <button type="submit" class="prostor-btn prostor-btn--primary">Отправить заявку</button>
+        </div>
+      </form>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const SIMILAR = [
+  {code:"09-3315", name:"Клапан обратный Ду50", folder:"Трубопроводы / Арматура"},
+  {code:"09-3316", name:"Клапан запорный шаровой Ду32", folder:"Трубопроводы / Арматура"},
+  {code:"12-0512", name:"Фильтр-осушитель Danfoss DML083", folder:"Холодильное оборудование / Арматура"},
+];
+
+class Component extends DCLogic {
+  state = { step: 1, searchQuery: "", reviewed: {}, matched: null };
+
+  setSearchQuery = (e) => this.setState({ searchQuery: e.target.value });
+  markMatch = (code) => this.setState({ matched: code, reviewed: { ...this.state.reviewed, [code]: "match" } });
+  markSkip = (code) => this.setState(s => ({ reviewed: { ...s.reviewed, [code]: "skip" } }));
+  goToStep2 = () => this.setState({ step: 2 });
+  backToStep1 = () => this.setState({ step: 1 });
+  goToDetail = () => { window.location.href = "NomenclatureDetail.dc.html"; };
+  handleSubmit = (e) => { e.preventDefault(); window.location.href = "RequestsList.dc.html"; };
+
+  renderVals() {
+    const { step, reviewed, matched } = this.state;
+    const similarItems = SIMILAR.map(it => {
+      const status = reviewed[it.code];
+      return {
+        ...it,
+        showActions: !status,
+        showBadge: !!status,
+        badgeClass: "prostor-badge " + (status === "match" ? "prostor-badge--success" : "prostor-badge--neutral"),
+        badgeLabel: status === "match" ? "Отмечено: это оно" : "Просмотрено, не подходит",
+        markMatch: () => this.markMatch(it.code),
+        markSkip: () => this.markSkip(it.code),
+      };
+    });
+    const allReviewed = SIMILAR.every(it => reviewed[it.code]);
+
+    return {
+      step1Class: "wiz-num" + (step > 1 ? " done" : " current"),
+      step2Class: "wiz-num" + (step === 2 ? " current" : ""),
+      step1LabelClass: "wiz-label" + (step === 1 ? " current" : ""),
+      step2LabelClass: "wiz-label" + (step === 2 ? " current" : ""),
+      isStep1: step === 1, isStep2: step === 2,
+      searchQuery: this.state.searchQuery, setSearchQuery: this.setSearchQuery,
+      similarItems,
+      hasMatch: !!matched, noMatch: !matched,
+      continueDisabled: !allReviewed,
+      goToStep2: this.goToStep2, backToStep1: this.backToStep1, goToDetail: this.goToDetail, handleSubmit: this.handleSubmit,
+    };
+  }
+}
+</script>
+</body>
+</html>

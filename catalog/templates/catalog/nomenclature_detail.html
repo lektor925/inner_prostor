@@ -3,40 +3,74 @@
 {% block title %}{{ nomenclature.name }}{% endblock %}
 
 {% block content %}
-<article class="nomenclature-detail">
+<div class="prostor-container prostor-container--app prostor-page">
+    <nav class="prostor-breadcrumbs">
+        <a href="{% url 'catalog:home' %}">Главная</a>
+        <span class="prostor-breadcrumbs__sep">/</span>
+        <a href="{% url 'catalog:nomenclature_list' %}">Номенклатура</a>
+        <span class="prostor-breadcrumbs__sep">/</span>
+        <span aria-current="page">{{ nomenclature.article|default:nomenclature.name }}</span>
+    </nav>
+
+    <div class="prostor-section-heading">
+        <span class="prostor-section-heading__rule"></span>
+        <p class="prostor-section-heading__eyebrow">Номенклатура</p>
+        <h1 class="prostor-section-heading__title">{{ nomenclature.name }}</h1>
+    </div>
+
     {% if not nomenclature.is_active %}
-    <p class="badge badge--inactive">не актуально — позиция помечена на удаление в 1С</p>
+    <div class="prostor-alert" style="margin-bottom:24px">
+        <span class="prostor-alert__bar"></span>
+        <div>
+            <p class="prostor-alert__title">Позиция не актуальна</p>
+            <p class="prostor-alert__body">Позиция помечена на удаление в 1С. Доступна по прямой ссылке, но скрыта из поиска.</p>
+        </div>
+    </div>
     {% endif %}
 
-    <h1>{{ nomenclature.name }}</h1>
-    <dl class="nomenclature-detail__attrs">
-        <dt>Артикул</dt><dd>{{ nomenclature.article|default:'—' }}</dd>
-        <dt>Единица измерения</dt><dd>{{ nomenclature.base_unit|default:'—' }}</dd>
-        <dt>Вид номенклатуры</dt><dd>{{ nomenclature.kind|default:'—' }}</dd>
-        <dt>Папка</dt><dd>{{ nomenclature.folder|default:'—' }}</dd>
-        <dt>Доступно суммарно</dt>
-        <dd>
-            {{ nomenclature.total_available }}
-            {% if nomenclature.is_stale %}<span class="badge badge--stale">залежалось</span>{% endif %}
-        </dd>
-    </dl>
+    <div class="prostor-card prostor-card--outline prostor-card--pad-lg" style="margin-bottom:24px">
+        <dl class="dl-grid">
+            <div class="dl-item"><dt>Артикул</dt><dd class="mono">{{ nomenclature.article|default:'—' }}</dd></div>
+            <div class="dl-item"><dt>Код 1С</dt><dd class="mono">{{ nomenclature.code_1c }}</dd></div>
+            <div class="dl-item"><dt>Единица измерения</dt><dd>{{ nomenclature.base_unit|default:'—' }}</dd></div>
+            <div class="dl-item"><dt>Вид номенклатуры</dt><dd>{{ nomenclature.kind|default:'—' }}</dd></div>
+            <div class="dl-item"><dt>Папка</dt><dd>{{ nomenclature.folder|default:'—' }}</dd></div>
+            <div class="dl-item">
+                <dt>Доступно суммарно</dt>
+                <dd class="mono">
+                    {{ nomenclature.total_available|floatformat:'-3' }}
+                    {% if nomenclature.is_stale %}<span class="prostor-badge prostor-badge--warning"><span class="prostor-badge__dot"></span>залежалось</span>{% endif %}
+                </dd>
+            </div>
+        </dl>
+    </div>
 
-    <table class="stock-table">
-        <thead>
-            <tr><th>Склад</th><th>Остаток</th><th>В резерве</th><th>Доступно</th></tr>
-        </thead>
-        <tbody>
-            {% for balance in nomenclature.stock_balances.all %}
-            <tr>
-                <td>{{ balance.warehouse.name }}</td>
-                <td>{{ balance.qty }}</td>
-                <td>{{ balance.reserved }}</td>
-                <td>{{ balance.available }}</td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="4">Остатков нет.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</article>
+    <div class="prostor-card prostor-card--outline prostor-card--pad-lg">
+        <p class="prostor-card__title">Остатки по складам</p>
+        <div class="prostor-table-wrap">
+            <table class="prostor-table">
+                <thead>
+                    <tr>
+                        <th>Склад</th>
+                        <th class="prostor-table__end prostor-table__mono">Остаток</th>
+                        <th class="prostor-table__end prostor-table__mono">В резерве</th>
+                        <th class="prostor-table__end prostor-table__mono">Доступно</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for balance in nomenclature.stock_balances.all %}
+                    <tr>
+                        <td>{{ balance.warehouse.name }}</td>
+                        <td class="prostor-table__end prostor-table__mono">{{ balance.qty|floatformat:'-3' }}</td>
+                        <td class="prostor-table__end prostor-table__mono">{{ balance.reserved|floatformat:'-3' }}</td>
+                        <td class="prostor-table__end prostor-table__mono">{{ balance.available|floatformat:'-3' }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="prostor-table__muted">Остатков нет.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}

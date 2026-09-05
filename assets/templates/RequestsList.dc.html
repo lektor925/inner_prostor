@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700&family=Arimo:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+:root{
+--prostor-red-500:#FF0000;--prostor-red-600:#D60000;
+--prostor-grey-900:#212121;--prostor-grey-700:#55585C;--prostor-grey-500:#9E9D9F;--prostor-grey-300:#CFD2D3;--prostor-grey-200:#E4E6E7;--prostor-grey-100:#F6F6F6;--prostor-grey-050:#F3F5F6;--prostor-white:#FFFFFF;
+--prostor-green-600:#2E7D32;--prostor-green-050:#EAF3EA;
+--prostor-crimson-600:#C62828;--prostor-crimson-050:#FBEAEA;
+--prostor-blue-600:#1565C0;--prostor-blue-050:#E8F0FA;
+--prostor-brand:var(--prostor-red-500);--prostor-brand-hover:var(--prostor-red-600);
+--prostor-text-primary:var(--prostor-grey-700);--prostor-text-heading:var(--prostor-grey-900);--prostor-text-muted:var(--prostor-grey-500);--prostor-text-inverse:var(--prostor-white);
+--prostor-text-link:var(--prostor-grey-700);--prostor-text-link-hover:var(--prostor-red-500);
+--prostor-bg-page:var(--prostor-white);--prostor-bg-subtle:var(--prostor-grey-050);--prostor-bg-muted:var(--prostor-grey-100);
+--prostor-border-default:var(--prostor-grey-200);
+--prostor-success:var(--prostor-green-600);--prostor-success-bg:var(--prostor-green-050);
+--prostor-danger:var(--prostor-crimson-600);--prostor-danger-bg:var(--prostor-crimson-050);
+--prostor-info:var(--prostor-blue-600);--prostor-info-bg:var(--prostor-blue-050);
+--prostor-font-display:"Archivo Expanded",Verdana,Arial,sans-serif;
+--prostor-font-body:"Arimo",Verdana,Arial,sans-serif;
+--prostor-font-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+--prostor-font-size-xl:36px;--prostor-font-size-sm:15px;--prostor-font-size-xs:13px;
+--prostor-line-height-heading:1.1;
+--prostor-letter-spacing-tight:.02em;--prostor-letter-spacing-normal:.03em;
+--prostor-space-3:12px;--prostor-space-4:16px;--prostor-space-6:24px;--prostor-space-8:32px;
+--prostor-container-app:1200px;--prostor-container-gutter:20px;--prostor-header-height:80px;--prostor-rule-width:30px;
+--prostor-radius-md:10px;--prostor-radius-full:9999px;--prostor-z-sticky:1100;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--prostor-bg-page);color:var(--prostor-text-primary);font-family:var(--prostor-font-body);letter-spacing:var(--prostor-letter-spacing-normal)}
+a{color:var(--prostor-text-link);text-decoration:underline}
+a:hover{color:var(--prostor-text-link-hover)}
+
+.prostor-topbar{background:var(--prostor-bg-subtle);border-bottom:1px solid var(--prostor-border-default)}
+.prostor-topbar--sticky{position:sticky;top:0;z-index:var(--prostor-z-sticky)}
+.prostor-topbar__inner{display:flex;align-items:center;gap:var(--prostor-space-8);height:var(--prostor-header-height);max-width:1400px;margin-inline:auto;padding-inline:var(--prostor-container-gutter)}
+.prostor-topbar__brand{display:flex;align-items:center;flex-shrink:0;gap:10px;font-family:var(--prostor-font-display);font-weight:700;letter-spacing:.06em;color:var(--prostor-text-heading);font-size:15px}
+.prostor-topbar__brand-mark{width:18px;height:18px;background:var(--prostor-brand);flex:none}
+.prostor-topbar__nav{display:flex;align-items:center;gap:24px;font-size:var(--prostor-font-size-sm)}
+.prostor-topbar__nav a{color:var(--prostor-text-primary);text-decoration:none}
+.prostor-topbar__nav a:hover,.prostor-topbar__nav a[aria-current="page"]{color:var(--prostor-brand)}
+.prostor-topbar__actions{display:flex;align-items:center;gap:12px;margin-left:auto}
+
+.prostor-container{width:100%;margin-inline:auto;padding-inline:var(--prostor-container-gutter)}
+.prostor-container--app{max-width:var(--prostor-container-app)}
+
+.prostor-heading-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:var(--prostor-space-6)}
+.prostor-section-heading__rule{display:block;width:var(--prostor-rule-width);height:3px;background:var(--prostor-brand);margin-bottom:var(--prostor-space-4)}
+.prostor-section-heading__eyebrow{margin:0 0 8px;font-size:var(--prostor-font-size-xs);letter-spacing:.08em;text-transform:uppercase;color:var(--prostor-text-muted)}
+.prostor-section-heading__title{margin:0;font-family:var(--prostor-font-display);font-weight:700;font-size:var(--prostor-font-size-xl);line-height:var(--prostor-line-height-heading);letter-spacing:var(--prostor-letter-spacing-tight);color:var(--prostor-text-heading)}
+.prostor-section-heading__description{margin:var(--prostor-space-3) 0 0;color:var(--prostor-text-primary)}
+
+.prostor-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;border-radius:var(--prostor-radius-md);font-family:var(--prostor-font-body);font-size:var(--prostor-font-size-sm);cursor:pointer;padding:10px 20px}
+.prostor-btn--primary{background:var(--prostor-brand);color:var(--prostor-text-inverse)}
+.prostor-btn--primary:hover{background:var(--prostor-brand-hover)}
+.prostor-btn--ghost{background:transparent;color:var(--prostor-text-primary);padding:6px 12px}
+.prostor-btn--ghost:hover{background:var(--prostor-bg-subtle)}
+
+.prostor-badge{display:inline-flex;align-items:center;gap:8px;padding:2px 10px;border-radius:var(--prostor-radius-full);font-size:var(--prostor-font-size-xs);line-height:1.6;white-space:nowrap}
+.prostor-badge__dot{width:6px;height:6px;border-radius:var(--prostor-radius-full);background:currentColor}
+.prostor-badge--success{color:var(--prostor-success);background:var(--prostor-success-bg)}
+.prostor-badge--danger{color:var(--prostor-danger);background:var(--prostor-danger-bg)}
+.prostor-badge--info{color:var(--prostor-info);background:var(--prostor-info-bg)}
+.prostor-badge--neutral{color:var(--prostor-text-primary);background:var(--prostor-bg-muted)}
+.prostor-badge--solid{color:#fff}
+.prostor-badge--solid.prostor-badge--success{background:var(--prostor-success)}
+
+.prostor-table{width:100%;border-collapse:collapse;font-size:var(--prostor-font-size-sm)}
+.prostor-table thead th{background:var(--prostor-bg-subtle);color:var(--prostor-text-heading);font-family:var(--prostor-font-display);font-weight:700;text-align:start;border-bottom:2px solid var(--prostor-grey-300)}
+.prostor-table th,.prostor-table td{padding:12px 16px}
+.prostor-table tbody tr{border-bottom:1px solid var(--prostor-border-default)}
+.prostor-table__mono{font-family:var(--prostor-font-mono);font-size:.95em;color:var(--prostor-text-heading)}
+.prostor-table__end{text-align:end}
+.prostor-table__muted{color:var(--prostor-text-muted)}
+</style>
+</helmet>
+
+<div>
+  <div class="prostor-topbar prostor-topbar--sticky">
+    <div class="prostor-topbar__inner">
+      <span class="prostor-topbar__brand"><span class="prostor-topbar__brand-mark"></span>PROSTOR</span>
+      <nav class="prostor-topbar__nav">
+        <a href="Home.dc.html">Главная</a>
+        <a href="NomenclatureList.dc.html">Номенклатура</a>
+        <a href="RequestsList.dc.html" aria-current="page">Мои заявки</a>
+      </nav>
+      <div class="prostor-topbar__actions">
+        <a href="Login.dc.html" class="prostor-btn prostor-btn--ghost">Выйти</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="prostor-container prostor-container--app" style="padding-top:32px;padding-bottom:64px">
+    <div class="prostor-heading-row">
+      <div>
+        <span class="prostor-section-heading__rule"></span>
+        <p class="prostor-section-heading__eyebrow">Номенклатура</p>
+        <h1 class="prostor-section-heading__title">Мои заявки</h1>
+        <p class="prostor-section-heading__description">Заявки на новые позиции и их статус в 1С.</p>
+      </div>
+      <a href="RequestForm.dc.html" class="prostor-btn prostor-btn--primary">Оставить новую заявку</a>
+    </div>
+
+    <table class="prostor-table">
+      <thead>
+        <tr><th class="prostor-table__end prostor-table__mono">№</th><th>Наименование</th><th>Статус</th><th class="prostor-table__mono">Дата</th><th>Комментарий</th></tr>
+      </thead>
+      <tbody>
+        <sc-for list="{{ requests }}" as="r" hint-placeholder-count="6">
+          <tr>
+            <td class="prostor-table__end prostor-table__mono">{{ r.id }}</td>
+            <td>{{ r.name }}</td>
+            <td><span class="{{ r.badgeClass }}"><sc-if value="{{ r.showDot }}" hint-placeholder-val="{{ true }}"><span class="prostor-badge__dot"></span></sc-if>{{ r.statusLabel }}</span></td>
+            <td class="prostor-table__mono">{{ r.date }}</td>
+            <td class="prostor-table__muted">{{ r.comment }}</td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const REQUESTS = [
+  {id:104, name:"Кронштейн крепления борта площадки", status:"new", date:"03.09.2026", comment:null},
+  {id:103, name:"Датчик температуры Pt1000 угловой", status:"approved", date:"01.09.2026", comment:"Одобрено, ожидайте заведения в 1С."},
+  {id:101, name:"Прокладка фланцевая Ду80 EPDM", status:"in1c", date:"29.08.2026", comment:"Заведена в 1С под артикулом 22-0410."},
+  {id:98, name:"Хомут силовой для кабель-канала", status:"closed", date:"20.08.2026", comment:null},
+  {id:95, name:"Уголок монтажный 40×40 нержавеющий", status:"rejected", date:"18.08.2026", comment:"Уже есть в справочнике: 45-0221."},
+  {id:90, name:"Плата контроллера доп. модуль", status:"in1c", date:"12.08.2026", comment:"Заведена в 1С под артикулом 33-0044."},
+];
+const STATUS_META = {
+  new: {label:"Новая", tone:"info", solid:false},
+  approved: {label:"Одобрена", tone:"success", solid:false},
+  in1c: {label:"Заведена в 1С", tone:"success", solid:true},
+  closed: {label:"Закрыта", tone:"neutral", solid:false},
+  rejected: {label:"Отклонена", tone:"danger", solid:false},
+};
+
+class Component extends DCLogic {
+  renderVals() {
+    const requests = REQUESTS.map(r => {
+      const m = STATUS_META[r.status];
+      return {
+        ...r,
+        statusLabel: m.label,
+        badgeClass: "prostor-badge prostor-badge--" + m.tone + (m.solid ? " prostor-badge--solid" : ""),
+        showDot: !m.solid,
+        comment: r.comment || "—",
+      };
+    });
+    return { requests };
+  }
+}
+</script>
+</body>
+</html>

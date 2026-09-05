@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700&family=Arimo:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+:root{
+--prostor-red-500:#FF0000;--prostor-red-600:#D60000;
+--prostor-grey-900:#212121;--prostor-grey-700:#55585C;--prostor-grey-500:#9E9D9F;--prostor-grey-300:#CFD2D3;--prostor-grey-200:#E4E6E7;--prostor-grey-100:#F6F6F6;--prostor-grey-050:#F3F5F6;--prostor-white:#FFFFFF;
+--prostor-amber-600:#B26A00;--prostor-amber-050:#FBF1E3;
+--prostor-brand:var(--prostor-red-500);--prostor-brand-hover:var(--prostor-red-600);--prostor-brand-subtle:#FBEAEA;
+--prostor-text-primary:var(--prostor-grey-700);--prostor-text-heading:var(--prostor-grey-900);--prostor-text-muted:var(--prostor-grey-500);--prostor-text-inverse:var(--prostor-white);
+--prostor-text-link:var(--prostor-grey-700);--prostor-text-link-hover:var(--prostor-red-500);
+--prostor-bg-page:var(--prostor-white);--prostor-bg-subtle:var(--prostor-grey-050);--prostor-bg-muted:var(--prostor-grey-100);
+--prostor-border-default:var(--prostor-grey-200);--prostor-border-strong:var(--prostor-grey-300);--prostor-border-focus:var(--prostor-red-500);
+--prostor-warning:var(--prostor-amber-600);--prostor-warning-bg:var(--prostor-amber-050);
+--prostor-focus-ring:0 0 0 2px rgba(255,0,0,.45);
+--prostor-font-display:"Archivo Expanded",Verdana,Arial,sans-serif;
+--prostor-font-body:"Arimo",Verdana,Arial,sans-serif;
+--prostor-font-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+--prostor-font-size-xl:36px;--prostor-font-size-base:18px;--prostor-font-size-sm:15px;--prostor-font-size-xs:13px;
+--prostor-line-height-heading:1.1;
+--prostor-letter-spacing-tight:.02em;--prostor-letter-spacing-normal:.03em;
+--prostor-space-2:8px;--prostor-space-3:12px;--prostor-space-4:16px;--prostor-space-6:24px;--prostor-space-8:32px;
+--prostor-container-app:1200px;--prostor-container-gutter:20px;--prostor-header-height:80px;--prostor-rule-width:30px;
+--prostor-radius-md:10px;--prostor-radius-full:9999px;
+--prostor-duration-fast:150ms;--prostor-z-sticky:1100;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--prostor-bg-page);color:var(--prostor-text-primary);font-family:var(--prostor-font-body);letter-spacing:var(--prostor-letter-spacing-normal)}
+a{color:var(--prostor-text-link);text-decoration:underline}
+a:hover{color:var(--prostor-text-link-hover)}
+
+.prostor-topbar{background:var(--prostor-bg-subtle);border-bottom:1px solid var(--prostor-border-default)}
+.prostor-topbar--sticky{position:sticky;top:0;z-index:var(--prostor-z-sticky)}
+.prostor-topbar__inner{display:flex;align-items:center;gap:var(--prostor-space-8);height:var(--prostor-header-height);max-width:1400px;margin-inline:auto;padding-inline:var(--prostor-container-gutter)}
+.prostor-topbar__brand{display:flex;align-items:center;flex-shrink:0;gap:10px;font-family:var(--prostor-font-display);font-weight:700;letter-spacing:.06em;color:var(--prostor-text-heading);font-size:15px}
+.prostor-topbar__brand-mark{width:18px;height:18px;background:var(--prostor-brand);flex:none}
+.prostor-topbar__nav{display:flex;align-items:center;gap:var(--prostor-space-6);font-size:var(--prostor-font-size-sm)}
+.prostor-topbar__nav a{color:var(--prostor-text-primary);text-decoration:none}
+.prostor-topbar__nav a:hover,.prostor-topbar__nav a[aria-current="page"]{color:var(--prostor-brand)}
+.prostor-topbar__actions{display:flex;align-items:center;gap:var(--prostor-space-3);margin-left:auto}
+
+.prostor-container{width:100%;margin-inline:auto;padding-inline:var(--prostor-container-gutter)}
+.prostor-container--app{max-width:var(--prostor-container-app)}
+
+.prostor-section-heading{margin-bottom:var(--prostor-space-6)}
+.prostor-section-heading__rule{display:block;width:var(--prostor-rule-width);height:3px;background:var(--prostor-brand);margin-bottom:var(--prostor-space-4)}
+.prostor-section-heading__eyebrow{margin:0 0 var(--prostor-space-2);font-size:var(--prostor-font-size-xs);letter-spacing:.08em;text-transform:uppercase;color:var(--prostor-text-muted)}
+.prostor-section-heading__title{margin:0;font-family:var(--prostor-font-display);font-weight:700;font-size:var(--prostor-font-size-xl);line-height:var(--prostor-line-height-heading);letter-spacing:var(--prostor-letter-spacing-tight);color:var(--prostor-text-heading)}
+.prostor-section-heading__description{margin:var(--prostor-space-3) 0 0;color:var(--prostor-text-primary)}
+
+.prostor-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;border-radius:var(--prostor-radius-md);font-family:var(--prostor-font-body);font-size:var(--prostor-font-size-sm);cursor:pointer}
+.prostor-btn--sm{padding:6px 12px}
+.prostor-btn--primary{background:var(--prostor-brand);color:var(--prostor-text-inverse)}
+.prostor-btn--primary:hover{background:var(--prostor-brand-hover)}
+.prostor-btn--ghost{background:transparent;color:var(--prostor-text-primary);border-color:transparent}
+.prostor-btn--ghost:hover{background:var(--prostor-bg-subtle)}
+
+.prostor-badge{display:inline-flex;align-items:center;gap:8px;padding:2px 10px;border-radius:var(--prostor-radius-full);font-size:var(--prostor-font-size-xs);line-height:1.6;white-space:nowrap}
+.prostor-badge__dot{width:6px;height:6px;border-radius:var(--prostor-radius-full);background:currentColor}
+.prostor-badge--warning{color:var(--prostor-warning);background:var(--prostor-warning-bg)}
+.prostor-badge--neutral{color:var(--prostor-text-primary);background:var(--prostor-bg-muted)}
+
+.prostor-control{width:100%;font-family:var(--prostor-font-body);font-size:var(--prostor-font-size-sm);color:var(--prostor-text-heading);background:var(--prostor-bg-page);border:1px solid var(--prostor-border-strong);border-radius:var(--prostor-radius-md);padding:10px 12px}
+.prostor-control:focus{outline:none;border-color:var(--prostor-border-focus);box-shadow:var(--prostor-focus-ring)}
+.prostor-field__label{font-size:var(--prostor-font-size-sm);font-weight:700;font-family:var(--prostor-font-display);color:var(--prostor-text-heading);display:block;margin-bottom:8px}
+.prostor-field__hint{margin:4px 0 0;font-size:var(--prostor-font-size-xs);color:var(--prostor-text-muted)}
+
+.prostor-checkbox{display:flex;gap:12px;align-items:flex-start;cursor:pointer;font-size:var(--prostor-font-size-sm);color:var(--prostor-text-primary)}
+.prostor-checkbox input{appearance:none;flex:0 0 auto;width:18px;height:18px;margin-top:1px;border:2px solid var(--prostor-border-strong);border-radius:6px;background:var(--prostor-bg-page);cursor:pointer}
+.prostor-checkbox input:checked{background:var(--prostor-brand) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='10' viewBox='0 0 12 10'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M1 5l3.5 3.5L11 1.5'/%3E%3C/svg%3E") center no-repeat;border-color:var(--prostor-brand)}
+
+.prostor-table{width:100%;border-collapse:collapse;font-size:var(--prostor-font-size-sm);color:var(--prostor-text-primary)}
+.prostor-table thead th{background:var(--prostor-bg-subtle);color:var(--prostor-text-heading);font-family:var(--prostor-font-display);font-weight:700;text-align:start;letter-spacing:var(--prostor-letter-spacing-tight);border-bottom:2px solid var(--prostor-border-strong);white-space:nowrap}
+.prostor-table th,.prostor-table td{padding:12px 16px}
+.prostor-table tbody tr{border-bottom:1px solid var(--prostor-border-default);cursor:pointer}
+.prostor-table tbody tr:hover{background:var(--prostor-brand-subtle)}
+.prostor-table__mono{font-family:var(--prostor-font-mono);font-size:.95em;color:var(--prostor-text-heading)}
+.prostor-table__end{text-align:end}
+
+.prostor-pagination{display:flex;align-items:center;gap:12px;font-size:var(--prostor-font-size-sm)}
+.prostor-pagination__arrow{min-width:36px;height:36px;padding:0 8px;border:1px solid var(--prostor-border-default);border-radius:var(--prostor-radius-md);background:transparent;color:var(--prostor-text-primary);cursor:pointer}
+.prostor-pagination__arrow:hover:not(:disabled){background:var(--prostor-bg-subtle)}
+.prostor-pagination__arrow:disabled{opacity:.4;cursor:not-allowed}
+
+.prostor-empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:64px 24px;border:1px dashed var(--prostor-border-strong);border-radius:var(--prostor-radius-md);color:var(--prostor-text-muted)}
+.prostor-empty__title{margin:0;font-family:var(--prostor-font-display);font-weight:700;font-size:21px;color:var(--prostor-text-heading)}
+.prostor-empty__description{margin:0;max-width:44ch;font-size:var(--prostor-font-size-sm)}
+.prostor-empty__action{margin-top:16px}
+
+.nl-layout{display:flex;gap:32px;align-items:flex-start}
+.nl-facets{width:220px;flex:none;display:flex;flex-direction:column;gap:24px}
+.nl-facet-title{font:700 12px var(--prostor-font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--prostor-text-muted);margin:0 0 10px}
+.nl-main{flex:1;min-width:0}
+.sb-facet-root{display:block;width:100%;text-align:left;padding:7px 8px;border-radius:8px;font:700 14px var(--prostor-font-body);color:var(--prostor-text-heading);background:none;border:none;cursor:pointer}
+.sb-facet-root:hover{background:var(--prostor-bg-subtle)}
+.sb-facet-root.active{background:var(--prostor-bg-subtle);color:var(--prostor-brand)}
+.sb-facet-sub{display:block;width:100%;text-align:left;padding:6px 8px 6px 20px;border-radius:8px;font:400 13px var(--prostor-font-body);color:var(--prostor-text-primary);background:none;border:none;cursor:pointer}
+.sb-facet-sub:hover{background:var(--prostor-bg-subtle)}
+.sb-facet-sub.active{background:var(--prostor-bg-subtle);color:var(--prostor-brand);font-weight:700}
+.nl-toolbar{margin-bottom:20px}
+.nl-count{font-size:13px;color:var(--prostor-text-muted);margin:0 0 12px}
+.nl-inactive-row td{opacity:.5}
+</style>
+</helmet>
+
+<div>
+  <div class="prostor-topbar prostor-topbar--sticky">
+    <div class="prostor-topbar__inner">
+      <span class="prostor-topbar__brand"><span class="prostor-topbar__brand-mark"></span>PROSTOR</span>
+      <nav class="prostor-topbar__nav">
+        <a href="Home.dc.html">Главная</a>
+        <a href="NomenclatureList.dc.html" aria-current="page">Номенклатура</a>
+        <a href="RequestsList.dc.html">Мои заявки</a>
+      </nav>
+      <div class="prostor-topbar__actions">
+        <a href="Login.dc.html" class="prostor-btn prostor-btn--ghost prostor-btn--sm">Выйти</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="prostor-container prostor-container--app" style="padding-top:32px;padding-bottom:64px">
+    <div class="prostor-section-heading">
+      <span class="prostor-section-heading__rule"></span>
+      <p class="prostor-section-heading__eyebrow">Справочник</p>
+      <h1 class="prostor-section-heading__title">Номенклатура</h1>
+      <p class="prostor-section-heading__description">Данные обновляются ночной синхронизацией с 1С. 04.09.2026 03:00.</p>
+    </div>
+
+    <div class="nl-layout">
+      <aside class="nl-facets">
+        <div>
+          <p class="nl-facet-title">Вид номенклатуры</p>
+          <select class="prostor-control" value="{{ kind }}" onChange="{{ setKind }}">
+            <option value="">Все виды</option>
+            <option value="Оборудование">Оборудование</option>
+            <option value="Материалы">Материалы</option>
+            <option value="Комплектующие">Комплектующие</option>
+            <option value="Электрика">Электрика</option>
+          </select>
+        </div>
+
+        <div>
+          <p class="nl-facet-title">Папка</p>
+          <sc-for list="{{ folders }}" as="f" hint-placeholder-count="4">
+            <button type="button" class="{{ f.rootClass }}" onClick="{{ f.onClick }}">{{ f.root }}</button>
+            <sc-for list="{{ f.subs }}" as="s" hint-placeholder-count="2">
+              <button type="button" class="{{ s.cls }}" onClick="{{ s.onClick }}">{{ s.label }}</button>
+            </sc-for>
+          </sc-for>
+        </div>
+
+        <div>
+          <p class="nl-facet-title">Остаток</p>
+          <label class="prostor-checkbox"><input type="checkbox" checked="{{ staleOnly }}" onChange="{{ toggleStale }}">Только залежалось</label>
+          <div style="height:8px"></div>
+          <label class="prostor-checkbox"><input type="checkbox" checked="{{ showInactive }}" onChange="{{ toggleInactive }}">Показывать неактивные</label>
+        </div>
+
+        <button type="button" class="prostor-btn prostor-btn--ghost prostor-btn--sm" onClick="{{ resetFilters }}" style="align-self:flex-start">Сбросить фильтры</button>
+      </aside>
+
+      <div class="nl-main">
+        <div class="nl-toolbar">
+          <label class="prostor-field__label">Поиск</label>
+          <input class="prostor-control" placeholder="Например: компрессор GEA или 12-0431" value="{{ query }}" onChange="{{ setQuery }}">
+          <p class="prostor-field__hint">По наименованию или артикулу, опечатки допустимы</p>
+        </div>
+
+        <p class="nl-count">Показано {{ shownCount }} из {{ totalCount }}</p>
+
+        <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+          <table class="prostor-table">
+            <thead>
+              <tr>
+                <th>Наименование</th>
+                <th class="prostor-table__mono">Артикул</th>
+                <th>Ед. изм.</th>
+                <th>Папка</th>
+                <th>Вид</th>
+                <th class="prostor-table__end prostor-table__mono">Доступно</th>
+                <th>Статус</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ pageRows }}" as="r" hint-placeholder-count="6">
+                <tr class="{{ r.rowClass }}" onClick="{{ r.onClick }}">
+                  <td>{{ r.name }}</td>
+                  <td class="prostor-table__mono">{{ r.code }}</td>
+                  <td>{{ r.unit }}</td>
+                  <td>{{ r.folder }}</td>
+                  <td>{{ r.kind }}</td>
+                  <td class="prostor-table__end prostor-table__mono">{{ r.avail }}</td>
+                  <td>
+                    <sc-if value="{{ r.stale }}" hint-placeholder-val="{{ false }}">
+                      <span class="prostor-badge prostor-badge--warning"><span class="prostor-badge__dot"></span>Залежалось</span>
+                    </sc-if>
+                    <sc-if value="{{ r.inactiveBadge }}" hint-placeholder-val="{{ false }}">
+                      <span class="prostor-badge prostor-badge--neutral">Неактивна</span>
+                    </sc-if>
+                  </td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+          <div style="height:24px"></div>
+          <div class="prostor-pagination">
+            <button type="button" class="prostor-pagination__arrow" disabled="{{ prevDisabled }}" onClick="{{ prevPage }}">←</button>
+            <span>Стр. {{ page }} из {{ pageCount }}</span>
+            <button type="button" class="prostor-pagination__arrow" disabled="{{ nextDisabled }}" onClick="{{ nextPage }}">→</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ hasNoResults }}" hint-placeholder-val="{{ false }}">
+          <div class="prostor-empty">
+            <h3 class="prostor-empty__title">{{ emptyTitle }}</h3>
+            <p class="prostor-empty__description">Проверьте, что позиция действительно отсутствует в справочнике, прежде чем подавать заявку.</p>
+            <div class="prostor-empty__action">
+              <button type="button" class="prostor-btn prostor-btn--primary" style="padding:10px 20px" onClick="{{ goToRequestForm }}">Оставить заявку на новую позицию</button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const ITEMS = [
+  {code:"12-0431", name:"Компрессор винтовой GEA 300", unit:"шт", root:"Холодильное оборудование", sub:"Компрессоры", kind:"Оборудование", qty:2, reserve:0, stale:false, active:true},
+  {code:"07-1120", name:"Труба стальная 57×3,5", unit:"м", root:"Трубопроводы", sub:"Стальные трубы", kind:"Материалы", qty:480, reserve:48, stale:false, active:true},
+  {code:"33-0002", name:"Щит управления ЩУ-1", unit:"шт", root:"Электрика", sub:"Щиты", kind:"Электрика", qty:1, reserve:1, stale:true, active:true},
+  {code:"14-2207", name:"Насос циркуляционный WILO", unit:"шт", root:"Холодильное оборудование", sub:"Насосы", kind:"Оборудование", qty:6, reserve:2, stale:false, active:true},
+  {code:"21-0099", name:"Кабель силовой ВВГ 3×2,5", unit:"м", root:"Электрика", sub:"Кабельная продукция", kind:"Электрика", qty:1200, reserve:120, stale:false, active:true},
+  {code:"09-3315", name:"Клапан обратный Ду50", unit:"шт", root:"Трубопроводы", sub:"Арматура", kind:"Комплектующие", qty:14, reserve:0, stale:true, active:true},
+  {code:"45-0110", name:"Изоляция теплоизоляционная K-Flex 25мм", unit:"м²", root:"Стройматериалы", sub:"Изоляция", kind:"Материалы", qty:320, reserve:40, stale:false, active:true},
+  {code:"12-0512", name:"Фильтр-осушитель Danfoss DML083", unit:"шт", root:"Холодильное оборудование", sub:"Арматура", kind:"Комплектующие", qty:0, reserve:0, stale:false, active:true},
+  {code:"09-3316", name:"Клапан запорный шаровой Ду32", unit:"шт", root:"Трубопроводы", sub:"Арматура", kind:"Комплектующие", qty:22, reserve:4, stale:false, active:true},
+  {code:"45-0221", name:"Профиль монтажный алюминиевый", unit:"м", root:"Стройматериалы", sub:"Металлопрокат", kind:"Материалы", qty:640, reserve:0, stale:true, active:true},
+  {code:"14-2310", name:"Насос дренажный Grundfos", unit:"шт", root:"Холодильное оборудование", sub:"Насосы", kind:"Оборудование", qty:3, reserve:1, stale:false, active:true},
+  {code:"21-0150", name:"Кабель контрольный КВВГ 4×1,5", unit:"м", root:"Электрика", sub:"Кабельная продукция", kind:"Электрика", qty:890, reserve:90, stale:false, active:true},
+  {code:"33-0015", name:"Реле промежуточное РП-21", unit:"шт", root:"Электрика", sub:"Щиты", kind:"Электрика", qty:40, reserve:0, stale:true, active:true},
+  {code:"12-0433", name:"Ресивер аммиачный линейный", unit:"шт", root:"Холодильное оборудование", sub:"Ёмкости", kind:"Оборудование", qty:0, reserve:0, stale:false, active:false},
+];
+const FOLDER_TREE = [
+  {root:"Холодильное оборудование", subs:["Компрессоры","Насосы","Арматура","Ёмкости"]},
+  {root:"Трубопроводы", subs:["Стальные трубы","Арматура"]},
+  {root:"Электрика", subs:["Щиты","Кабельная продукция"]},
+  {root:"Стройматериалы", subs:["Изоляция","Металлопрокат"]},
+];
+const PAGE_SIZE = 6;
+function fmt(n){ return n.toLocaleString("ru-RU"); }
+
+class Component extends DCLogic {
+  state = { query:"", kind:"", folderRoot:null, folderSub:null, staleOnly:false, showInactive:false, page:1 };
+
+  setQuery = (e) => this.setState({ query: e.target.value, page:1 });
+  setKind = (e) => this.setState({ kind: e.target.value, page:1 });
+  toggleStale = (e) => this.setState({ staleOnly: e.target.checked, page:1 });
+  toggleInactive = (e) => this.setState({ showInactive: e.target.checked, page:1 });
+  prevPage = () => this.setState(s => ({ page: Math.max(1, s.page - 1) }));
+  nextPage = () => this.setState(s => ({ page: s.page + 1 }));
+  resetFilters = () => this.setState({ query:"", kind:"", folderRoot:null, folderSub:null, staleOnly:false, showInactive:false, page:1 });
+  pickRoot = (root) => this.setState(s => ({ folderRoot: s.folderRoot === root && !s.folderSub ? null : root, folderSub:null, page:1 }));
+  pickSub = (root, sub) => this.setState(s => ({ folderRoot: root, folderSub: s.folderSub === sub ? null : sub, page:1 }));
+  openDetail = () => { window.location.href = "NomenclatureDetail.dc.html"; };
+  goToRequestForm = () => { window.location.href = "RequestForm.dc.html"; };
+
+  getFiltered() {
+    const { query, kind, folderRoot, folderSub, staleOnly, showInactive } = this.state;
+    const q = query.trim().toLowerCase();
+    return ITEMS.filter(it => {
+      if (!showInactive && !it.active) return false;
+      if (q && !(it.name.toLowerCase().includes(q) || it.code.toLowerCase().includes(q))) return false;
+      if (kind && it.kind !== kind) return false;
+      if (folderRoot && it.root !== folderRoot) return false;
+      if (folderSub && it.sub !== folderSub) return false;
+      if (staleOnly && !it.stale) return false;
+      return true;
+    });
+  }
+
+  renderVals() {
+    const { folderRoot, folderSub } = this.state;
+    const folders = FOLDER_TREE.map(f => ({
+      root: f.root,
+      rootClass: "sb-facet-root" + (folderRoot === f.root && !folderSub ? " active" : ""),
+      onClick: () => this.pickRoot(f.root),
+      subs: f.subs.map(s => ({
+        label: s,
+        cls: "sb-facet-sub" + (folderRoot === f.root && folderSub === s ? " active" : ""),
+        onClick: () => this.pickSub(f.root, s),
+      })),
+    }));
+
+    const filtered = this.getFiltered();
+    const totalVisible = this.state.showInactive ? ITEMS.length : ITEMS.filter(i=>i.active).length;
+    const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    const page = Math.min(this.state.page, pageCount);
+    const pageRows = filtered.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE).map(it => ({
+      ...it,
+      folder: `${it.root} / ${it.sub}`,
+      avail: fmt(it.qty - it.reserve),
+      inactiveBadge: !it.stale && !it.active,
+      rowClass: it.active ? "" : "nl-inactive-row",
+      onClick: this.openDetail,
+    }));
+
+    return {
+      folders,
+      query: this.state.query, setQuery: this.setQuery,
+      kind: this.state.kind, setKind: this.setKind,
+      staleOnly: this.state.staleOnly, toggleStale: this.toggleStale,
+      showInactive: this.state.showInactive, toggleInactive: this.toggleInactive,
+      resetFilters: this.resetFilters,
+      pageRows,
+      page, pageCount, prevPage: this.prevPage, nextPage: this.nextPage,
+      prevDisabled: page <= 1, nextDisabled: page >= pageCount,
+      shownCount: fmt(filtered.length), totalCount: fmt(totalVisible),
+      hasResults: filtered.length > 0, hasNoResults: filtered.length === 0,
+      emptyTitle: this.state.query ? `По запросу «${this.state.query}» ничего не найдено` : "По заданным фильтрам ничего не найдено",
+      goToRequestForm: this.goToRequestForm,
+    };
+  }
+}
+</script>
+</body>
+</html>
