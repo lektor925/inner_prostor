@@ -1,0 +1,16 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Ошибка сервера{% endblock %}
+
+{% block content %}
+<div class="prostor-container prostor-container--app">
+    <div class="prostor-status">
+        <p class="prostor-status__code">500</p>
+        <h1 class="prostor-status__title">Что-то сломалось</h1>
+        <p class="prostor-status__text">Ошибка на нашей стороне. Обновите страницу или вернитесь позже; если повторяется — сообщите администратору.</p>
+        <div class="prostor-status__action">
+            <a href="{% url 'catalog:home' %}" class="prostor-btn prostor-btn--primary">На главную</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

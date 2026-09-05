@@ -1,0 +1,16 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Страница не найдена{% endblock %}
+
+{% block content %}
+<div class="prostor-container prostor-container--app">
+    <div class="prostor-status">
+        <p class="prostor-status__code">404</p>
+        <h1 class="prostor-status__title">Страница не найдена</h1>
+        <p class="prostor-status__text">Проверьте адрес: возможно, позиция удалена из справочника или ссылка устарела.</p>
+        <div class="prostor-status__action">
+            <a href="{% url 'catalog:home' %}" class="prostor-btn prostor-btn--primary">На главную</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

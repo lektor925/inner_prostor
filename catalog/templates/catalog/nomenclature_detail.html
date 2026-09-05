@@ -34,7 +34,7 @@
             <div class="dl-item"><dt>Код 1С</dt><dd class="mono">{{ nomenclature.code_1c }}</dd></div>
             <div class="dl-item"><dt>Единица измерения</dt><dd>{{ nomenclature.base_unit|default:'—' }}</dd></div>
             <div class="dl-item"><dt>Вид номенклатуры</dt><dd>{{ nomenclature.kind|default:'—' }}</dd></div>
-            <div class="dl-item"><dt>Папка</dt><dd>{{ nomenclature.folder|default:'—' }}</dd></div>
+            <div class="dl-item"><dt>Папка</dt><dd>{% if nomenclature.folder %}{{ nomenclature.folder.full_path }}{% else %}—{% endif %}</dd></div>
             <div class="dl-item">
                 <dt>Доступно суммарно</dt>
                 <dd class="mono">
