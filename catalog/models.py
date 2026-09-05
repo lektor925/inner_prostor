@@ -57,6 +57,24 @@ class Folder(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def full_path(self):
+        """
+        Путь от корня: «Оборудование / Холодильное / Компрессоры». Идёт вверх
+        по `parent`; глубина дерева 1С — единицы уровней (ADR-003). Обход в
+        Python, как и folders_by_hierarchy в views: сотни папок — не узкое
+        место. Для карточки позиции: `select_related('folder__parent__…')` в
+        NomenclatureDetailView гасит запросы на типовой глубине.
+        """
+        names = []
+        node = self
+        seen = set()
+        while node is not None and node.pk not in seen:
+            seen.add(node.pk)
+            names.append(node.name)
+            node = node.parent
+        return ' / '.join(reversed(names))
+
 
 class Nomenclature(models.Model):
     """Позиция номенклатуры (1С: Справочник.Номенклатура, не группа)."""

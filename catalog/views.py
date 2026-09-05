@@ -58,7 +58,14 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['total_count'] = Nomenclature.objects.filter(is_active=True).count()
+        active = Nomenclature.objects.filter(is_active=True)
+        context['total_count'] = active.count()
+        context['stale_count'] = active.filter(is_stale=True).count()
+        # «Открытые» заявки — те, что ещё ждут решения (не заведены, не
+        # закрыты, не отклонены).
+        context['open_requests'] = Request.objects.filter(
+            status__in=[Request.Status.NEW, Request.Status.APPROVED]
+        ).count()
         context['last_import'] = (
             ImportLog.objects.filter(
                 kind=ImportLog.Kind.REFERENCE,
@@ -188,7 +195,9 @@ class NomenclatureDetailView(DetailView):
         visible_balances = StockBalance.objects.filter(
             warehouse__is_visible=True
         ).select_related('warehouse')
-        return Nomenclature.objects.select_related('kind', 'folder').prefetch_related(
+        return Nomenclature.objects.select_related(
+            'kind', 'folder__parent__parent__parent'
+        ).prefetch_related(
             Prefetch('stock_balances', queryset=visible_balances)
         )
 

@@ -2,7 +2,8 @@ import unittest
 
 from django.contrib.auth import get_user_model
 from django.db import connection
-from django.test import TestCase
+from django.template.loader import render_to_string
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from catalog.models import (
@@ -58,6 +59,37 @@ class HomeViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['total_count'], 0)
+
+    def test_stat_counts_in_context(self):
+        Nomenclature.objects.create(code_1c='1', name='Свежая', is_stale=False)
+        Nomenclature.objects.create(code_1c='2', name='Залежалая', is_stale=True)
+        Nomenclature.objects.create(
+            code_1c='3', name='Залежалая снятая', is_stale=True, is_active=False,
+        )
+        alice = User.objects.create_user('alice')
+        Request.objects.create(
+            author=alice, description='ждёт', status=Request.Status.NEW,
+        )
+        Request.objects.create(
+            author=alice, description='одобрена', status=Request.Status.APPROVED,
+        )
+        Request.objects.create(
+            author=alice, description='закрыта', status=Request.Status.CLOSED,
+        )
+
+        response = self.client.get(reverse('catalog:home'))
+
+        self.assertEqual(response.context['stale_count'], 1)
+        self.assertEqual(response.context['open_requests'], 2)
+
+    def test_quick_links_present(self):
+        response = self.client.get(reverse('catalog:home'))
+
+        self.assertContains(response, 'Быстрые переходы')
+        self.assertContains(response, 'hm-stat')
+        self.assertContains(
+            response, f'href="{reverse("catalog:nomenclature_list")}?stale=1"'
+        )
 
     def test_last_import_uses_latest_successful_reference_run(self):
         old = ImportLog.objects.create(
@@ -327,6 +359,48 @@ class NomenclatureDetailViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'не актуальна')
+
+    def test_shows_full_folder_path(self):
+        root = Folder.objects.create(code_1c='r', name='Оборудование')
+        mid = Folder.objects.create(code_1c='m', name='Холодильное', parent=root)
+        leaf = Folder.objects.create(code_1c='l', name='Компрессоры', parent=mid)
+        Nomenclature.objects.create(code_1c='1', name='Компрессор', folder=leaf)
+
+        response = self.client.get(
+            reverse('catalog:nomenclature_detail', args=['1'])
+        )
+
+        self.assertContains(response, 'Оборудование / Холодильное / Компрессоры')
+
+
+class FolderFullPathTests(TestCase):
+    def test_joins_names_from_root_to_leaf(self):
+        root = Folder.objects.create(code_1c='r', name='Оборудование')
+        mid = Folder.objects.create(code_1c='m', name='Холодильное', parent=root)
+        leaf = Folder.objects.create(code_1c='l', name='Компрессоры', parent=mid)
+
+        self.assertEqual(leaf.full_path, 'Оборудование / Холодильное / Компрессоры')
+
+    def test_root_folder_path_is_its_name(self):
+        root = Folder.objects.create(code_1c='r', name='Оборудование')
+
+        self.assertEqual(root.full_path, 'Оборудование')
+
+
+class ErrorPageTests(TestCase):
+    @override_settings(DEBUG=False)
+    def test_404_uses_styled_template(self):
+        response = self.client.get('/no-such-page-here/')
+
+        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, 'Страница не найдена', status_code=404)
+        self.assertContains(response, 'prostor-status', status_code=404)
+
+    def test_500_template_renders(self):
+        html = render_to_string('500.html')
+
+        self.assertIn('Что-то сломалось', html)
+        self.assertIn('prostor-status', html)
 
 
 class FoldersByHierarchyTests(TestCase):

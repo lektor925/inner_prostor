@@ -35,5 +35,45 @@
             <img src="{% static 'catalog/man.jpg' %}" alt="Конструктор за кульманом с чертежами" width="684" height="700">
         </div>
     </section>
+
+    <section class="hm-block">
+        <div class="hm-stats">
+            <a class="hm-stat" href="{% url 'catalog:nomenclature_list' %}">
+                <div class="hm-stat__num">{{ total_count }}</div>
+                <p class="hm-stat__label">позиций в справочнике</p>
+                {% if last_import %}
+                <p class="hm-stat__caption">обновлено {{ last_import.finished_at|default:last_import.started_at|date:"d.m.Y H:i" }}</p>
+                {% endif %}
+            </a>
+            <a class="hm-stat" href="{% url 'catalog:nomenclature_list' %}?stale=1">
+                <div class="hm-stat__num">{{ stale_count }}</div>
+                <p class="hm-stat__label">залежалось на складе</p>
+                <p class="hm-stat__caption">можно использовать</p>
+            </a>
+            <a class="hm-stat" href="{% url 'catalog:request_list' %}">
+                <div class="hm-stat__num">{{ open_requests }}</div>
+                <p class="hm-stat__label">открытых заявок</p>
+                <p class="hm-stat__caption">ждут решения</p>
+            </a>
+        </div>
+    </section>
+
+    <section class="hm-block">
+        <p class="hm-block__title">Быстрые переходы</p>
+        <div class="hm-actions">
+            <a class="hm-action" href="{% url 'catalog:nomenclature_list' %}">
+                <span class="hm-action__title">Каталог номенклатуры</span>
+                <span class="hm-action__text">Поиск, фильтры и карточка позиции.</span>
+            </a>
+            <a class="hm-action" href="{% url 'catalog:request_create' %}">
+                <span class="hm-action__title">Заявка на новую позицию</span>
+                <span class="hm-action__text">Если нужной позиции нет в справочнике.</span>
+            </a>
+            <a class="hm-action" href="{% url 'catalog:request_list' %}">
+                <span class="hm-action__title">Мои заявки</span>
+                <span class="hm-action__text">Статус ранее поданных заявок.</span>
+            </a>
+        </div>
+    </section>
 </div>
 {% endblock %}
