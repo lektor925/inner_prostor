@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,13 +23,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
-    'DJANGO_SECRET_KEY',
-    'django-insecure-73(%iesoxg*&lz$8n_q^i1u(s7!kah2gnp^nde^_%7*kk_tr_g',
+_INSECURE_SECRET_KEY = (
+    'django-insecure-73(%iesoxg*&lz$8n_q^i1u(s7!kah2gnp^nde^_%7*kk_tr_g'
 )
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', _INSECURE_SECRET_KEY)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
+
+# В проде небезопасный ключ по умолчанию — фатальная ошибка конфигурации:
+# на нём подписываются сессии и CSRF-токены, публичный ключ обнуляет защиту.
+if not DEBUG and SECRET_KEY == _INSECURE_SECRET_KEY:
+    raise ImproperlyConfigured(
+        'DJANGO_SECRET_KEY не задан, а DEBUG выключен — запуск в проде с '
+        'ключом по умолчанию запрещён. Задайте DJANGO_SECRET_KEY в окружении.'
+    )
 
 ALLOWED_HOSTS = [h for h in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if h]
 
@@ -104,6 +114,16 @@ else:
         }
     }
 
+# sqlite не понимает pg_trgm/FTS — поиск по справочнику деградирует до
+# полного скана в Python (ADR-001/ADR-006). В проде это недопустимо:
+# отсутствие переменных подключения к Postgres — ошибка конфигурации, а не
+# повод молча уехать на sqlite.
+if not DEBUG and DATABASES['default']['ENGINE'].endswith('sqlite3'):
+    raise ImproperlyConfigured(
+        'DEBUG выключен, но БД — sqlite. Задайте DATABASE_NAME и остальные '
+        'переменные подключения к PostgreSQL (см. deploy/env.example).'
+    )
+
 
 # Password validation
 # https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
@@ -179,9 +199,6 @@ if not DEBUG:
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
+# Пока писем не шлём; на MVP выводим в консоль, а не в SMTP.
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

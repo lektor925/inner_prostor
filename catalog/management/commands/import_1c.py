@@ -35,8 +35,11 @@ management-команда: import_1c (ADR-009/ADR-010).
 }
 
 qty/reserved — строкой (сохраняет точность при парсинге в Decimal).
-Остатки — полный снимок: StockBalance, не попавшие в файл, удаляются
-(значит, остаток стал нулевым).
+Остатки — полный снимок в разрезе складов из файла: StockBalance на складах,
+перечисленных в файле (блок warehouses и строки balances), но не попавшие в
+новый файл, удаляются (значит, остаток стал нулевым). Склады, которых в файле
+нет вовсе, не затрагиваются — 1С обязана выгружать остатки по всем складам
+сразу, иначе снимок не полный.
 """
 
 import hashlib
@@ -92,20 +95,35 @@ def import_lock(kind, stdout):
     lock_path = Path(settings.IMPORT_DIR) / f'.import_{kind}.lock'
     lock_path.parent.mkdir(parents=True, exist_ok=True)
 
+    # Зависший lock от аварийно прерванного прежнего запуска снимаем сами —
+    # Windows Task Scheduler не гарантирует cleanup при убийстве процесса.
     if lock_path.exists():
         age = time.time() - lock_path.stat().st_mtime
-        if age < STALE_LOCK_SECONDS:
-            raise CommandError(
-                f'Импорт "{kind}" уже выполняется (lock-файл {lock_path}, '
-                f'возраст {age:.0f}с). Если это не так — удалите файл вручную.'
+        if age >= STALE_LOCK_SECONDS:
+            stdout.write(
+                f'Lock-файл {lock_path} старше {STALE_LOCK_SECONDS}с — '
+                'считаю зависшим, снимаю.'
             )
-        stdout.write(
-            f'Lock-файл {lock_path} старше {STALE_LOCK_SECONDS}с — '
-            'считаю зависшим, снимаю.'
-        )
-        lock_path.unlink(missing_ok=True)
+            lock_path.unlink(missing_ok=True)
 
-    lock_path.write_text(str(os.getpid()))
+    # Захват lock-файла атомарен (O_EXCL): между проверкой существования и
+    # созданием не может вклиниться второй параллельный запуск.
+    try:
+        fd = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError:
+        try:
+            age = time.time() - lock_path.stat().st_mtime
+        except OSError:
+            age = 0
+        raise CommandError(
+            f'Импорт "{kind}" уже выполняется (lock-файл {lock_path}, '
+            f'возраст {age:.0f}с). Если это не так — удалите файл вручную.'
+        )
+    try:
+        os.write(fd, str(os.getpid()).encode())
+    finally:
+        os.close(fd)
+
     try:
         yield
     finally:
@@ -215,7 +233,7 @@ class Command(BaseCommand):
         prev = (
             ImportLog.objects
             .filter(kind=kind, status=ImportLog.Status.OK)
-            .order_by('-started_at')
+            .order_by('-started_at', '-id')
             .first()
         )
         if not prev or prev.rows_total == 0:
@@ -246,7 +264,6 @@ class Command(BaseCommand):
         kinds = data.get('kinds', [])
         folders = data.get('folders', [])
         nomenclature = data.get('nomenclature', [])
-        total = len(kinds) + len(folders) + len(nomenclature)
 
         # --- виды ---
         for k in kinds:
@@ -328,7 +345,7 @@ class Command(BaseCommand):
             if folder_code and folder_obj is None:
                 row_errors.append((code, f'папка {folder_code} не найдена'))
 
-        return {'total': total, 'created': created, 'updated': updated, 'failed': failed}, row_errors
+        return {'created': created, 'updated': updated, 'failed': failed}, row_errors
 
     def _import_stock(self, data):
         row_errors = []
@@ -336,7 +353,6 @@ class Command(BaseCommand):
 
         warehouses = data.get('warehouses', [])
         balances = data.get('balances', [])
-        total = len(warehouses) + len(balances)
 
         for w in warehouses:
             code, name = w.get('code'), w.get('name')
@@ -353,6 +369,15 @@ class Command(BaseCommand):
         warehouse_by_code = {w.code_1c: w for w in Warehouse.objects.all()}
         nomenclature_by_code = {
             n.code_1c: n for n in Nomenclature.objects.only('id', 'code_1c').all()
+        }
+
+        # Склады, которые файл заявляет как присутствующие в этом снимке —
+        # из блока warehouses и из фактически обработанных строк остатков.
+        # Полный снимок применяется только в разрезе этих складов.
+        snapshot_warehouse_ids = {
+            warehouse_by_code[w['code']].id
+            for w in warehouses
+            if w.get('code') and w['code'] in warehouse_by_code
         }
 
         touched_ids = []
@@ -385,8 +410,14 @@ class Command(BaseCommand):
             created += was_created
             updated += not was_created
             touched_ids.append(obj.id)
+            snapshot_warehouse_ids.add(wh.id)
 
-        # Полный снимок: то, чего не было в файле, считаем нулевым остатком.
-        StockBalance.objects.exclude(id__in=touched_ids).delete()
+        # Полный снимок в разрезе складов из файла: остатки на этих складах,
+        # которых нет в новом файле, считаем нулевыми и удаляем. Склады, не
+        # упомянутые в файле вовсе, не трогаем — иначе неполная выгрузка
+        # (например, без одной площадки) молча стирала бы их остатки.
+        StockBalance.objects.filter(
+            warehouse_id__in=snapshot_warehouse_ids
+        ).exclude(id__in=touched_ids).delete()
 
-        return {'total': total, 'created': created, 'updated': updated, 'failed': failed}, row_errors
+        return {'created': created, 'updated': updated, 'failed': failed}, row_errors
