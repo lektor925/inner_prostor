@@ -3,9 +3,37 @@
 {% block title %}Вход{% endblock %}
 
 {% block content %}
-<form class="login-form" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Войти</button>
-</form>
+<div class="login-layout">
+    <div class="login-box">
+        <p class="login-box__intro">Справочник номенклатуры — внутренний портал конструктора. Вход по учётной записи предприятия.</p>
+
+        {% if form.non_field_errors %}
+        <div class="prostor-alert">
+            <span class="prostor-alert__bar"></span>
+            <div><p class="prostor-alert__body">{{ form.non_field_errors|join:" " }}</p></div>
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="prostor-field">
+                <label class="prostor-field__label" for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                <input class="prostor-control" type="text" name="{{ form.username.html_name }}"
+                       id="{{ form.username.id_for_label }}" autocomplete="username" autocapitalize="none" required
+                       {% if form.username.value %}value="{{ form.username.value }}"{% endif %}>
+                {% if form.username.errors %}<ul class="prostor-errorlist">{% for e in form.username.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+            </div>
+
+            <div class="prostor-field">
+                <label class="prostor-field__label" for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                <input class="prostor-control" type="password" name="{{ form.password.html_name }}"
+                       id="{{ form.password.id_for_label }}" autocomplete="current-password" required>
+                {% if form.password.errors %}<ul class="prostor-errorlist">{% for e in form.password.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+            </div>
+
+            <input type="hidden" name="next" value="{{ next }}">
+            <button type="submit" class="prostor-btn prostor-btn--primary">Войти</button>
+        </form>
+    </div>
+</div>
 {% endblock %}

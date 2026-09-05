@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700&family=Arimo:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+:root{
+--prostor-red-500:#FF0000;--prostor-red-600:#D60000;
+--prostor-grey-900:#212121;--prostor-grey-700:#55585C;--prostor-grey-500:#9E9D9F;--prostor-grey-300:#CFD2D3;--prostor-grey-050:#F3F5F6;--prostor-white:#FFFFFF;
+--prostor-brand:var(--prostor-red-500);--prostor-brand-hover:var(--prostor-red-600);
+--prostor-text-primary:var(--prostor-grey-700);--prostor-text-heading:var(--prostor-grey-900);--prostor-text-muted:var(--prostor-grey-500);--prostor-text-inverse:var(--prostor-white);
+--prostor-bg-page:var(--prostor-white);--prostor-border-strong:var(--prostor-grey-300);--prostor-border-focus:var(--prostor-red-500);
+--prostor-focus-ring:0 0 0 2px rgba(255,0,0,.45);
+--prostor-font-display:"Archivo Expanded",Verdana,Arial,sans-serif;
+--prostor-font-body:"Arimo",Verdana,Arial,sans-serif;
+--prostor-font-size-sm:15px;--prostor-radius-md:10px;--prostor-letter-spacing-normal:.03em;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--prostor-bg-page);font-family:var(--prostor-font-body);letter-spacing:var(--prostor-letter-spacing-normal)}
+.prostor-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;border-radius:var(--prostor-radius-md);font-family:var(--prostor-font-body);font-size:var(--prostor-font-size-sm);cursor:pointer;padding:14px 28px}
+.prostor-btn--primary{background:var(--prostor-brand);color:var(--prostor-text-inverse);width:100%}
+.prostor-btn--primary:hover{background:var(--prostor-brand-hover)}
+.prostor-field{display:flex;flex-direction:column;gap:8px}
+.prostor-field__label{font-size:var(--prostor-font-size-sm);font-weight:700;font-family:var(--prostor-font-display);color:var(--prostor-text-heading)}
+.prostor-control{width:100%;font-family:var(--prostor-font-body);font-size:var(--prostor-font-size-sm);color:var(--prostor-text-heading);background:var(--prostor-bg-page);border:1px solid var(--prostor-border-strong);border-radius:var(--prostor-radius-md);padding:10px 12px}
+.prostor-control:focus{outline:none;border-color:var(--prostor-border-focus);box-shadow:var(--prostor-focus-ring)}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center}
+.login-box{width:360px;display:flex;flex-direction:column;gap:24px}
+.login-brand{display:flex;gap:10px;align-items:center;font-family:var(--prostor-font-display);font-weight:700;letter-spacing:.06em;color:var(--prostor-text-heading);font-size:18px}
+.login-brand-mark{width:18px;height:18px;background:var(--prostor-brand);flex:none}
+.login-title{font:400 15px/1.4 var(--prostor-font-body);color:var(--prostor-text-muted);margin:0}
+</style>
+</helmet>
+
+<div class="login-wrap">
+  <div class="login-box">
+    <div class="login-brand"><span class="login-brand-mark"></span>PROSTOR</div>
+    <p class="login-title">Справочник номенклатуры — внутренний портал конструктора.</p>
+
+    <form onSubmit="{{ handleSubmit }}" style="display:flex;flex-direction:column;gap:16px">
+      <div class="prostor-field">
+        <label class="prostor-field__label">Логин</label>
+        <input class="prostor-control" name="login" autoComplete="username">
+      </div>
+      <div class="prostor-field">
+        <label class="prostor-field__label">Пароль</label>
+        <input class="prostor-control" type="password" name="password" autoComplete="current-password">
+      </div>
+      <button type="submit" class="prostor-btn prostor-btn--primary">Войти</button>
+    </form>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      handleSubmit: (e) => { e.preventDefault(); window.location.href = "Home.dc.html"; }
+    };
+  }
+}
+</script>
+</body>
+</html>

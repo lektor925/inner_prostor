@@ -1,0 +1,39 @@
+{% extends 'catalog/base.html' %}
+{% load static %}
+
+{% block title %}Справочник номенклатуры{% endblock %}
+
+{% block content %}
+<div class="prostor-container prostor-container--app" style="padding-bottom:64px">
+    <section class="hm-hero">
+        <div class="hm-hero__col">
+            <span class="hm-hero__rule"></span>
+            <p class="hm-hero__eyebrow">Справочник номенклатуры 1С:УПП</p>
+            <h1 class="hm-hero__title">Единый поиск по всей номенклатуре предприятия</h1>
+            <p class="hm-hero__lead">Находите позицию по наименованию или артикулу. Опечатки допустимы.</p>
+
+            <form class="hm-search" method="get" action="{% url 'catalog:nomenclature_list' %}">
+                <div class="prostor-field hm-search-field">
+                    <label class="prostor-field__label" for="hm-q">Поиск по справочнику</label>
+                    <input class="prostor-control prostor-control--lg" type="text" id="hm-q" name="q"
+                           placeholder="Например: компрессор GEA или 12-0431" autocomplete="off">
+                </div>
+                <button type="submit" class="prostor-btn prostor-btn--primary prostor-btn--lg">Искать</button>
+            </form>
+
+            <p class="hm-hero__meta">
+                {{ total_count }}&nbsp;позиций в справочнике.
+                {% if last_import %}
+                    Синхронизация с 1С — {{ last_import.finished_at|default:last_import.started_at|date:"d.m.Y H:i" }}.
+                {% else %}
+                    Синхронизация с 1С ещё не выполнялась.
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="hm-hero__figure">
+            <img src="{% static 'catalog/man.jpg' %}" alt="Конструктор за кульманом с чертежами" width="684" height="700">
+        </div>
+    </section>
+</div>
+{% endblock %}

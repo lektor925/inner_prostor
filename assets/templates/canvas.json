@@ -1,0 +1,11 @@
+{
+  "artboards": [
+    { "file": "Home.dc.html", "x": 0, "y": 0, "w": 1200, "h": 900 },
+    { "file": "Login.dc.html", "x": 1280, "y": 0, "w": 480, "h": 500 },
+    { "file": "NomenclatureList.dc.html", "x": 1840, "y": 0, "w": 1100, "h": 900 },
+    { "file": "NomenclatureDetail.dc.html", "x": 3020, "y": 0, "w": 900, "h": 700 },
+    { "file": "RequestForm.dc.html", "x": 4000, "y": 0, "w": 800, "h": 900 },
+    { "file": "RequestsList.dc.html", "x": 4880, "y": 0, "w": 1000, "h": 600 }
+  ],
+  "launch": { "view": "focused", "file": "Home.dc.html" }
+}

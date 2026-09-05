@@ -1,40 +1,96 @@
 {% extends 'catalog/base.html' %}
 
-{% block title %}Заявки на новые позиции{% endblock %}
+{% block title %}Мои заявки{% endblock %}
 
 {% block content %}
-<form class="request-filter" method="get" action="{% url 'catalog:request_list' %}">
-    <label for="filter-status">Статус</label>
-    <select id="filter-status" name="status">
-        <option value="">Все</option>
-        {% for value, label in statuses %}
-        <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
-    </select>
-    <button type="submit">Применить</button>
-</form>
+<div class="prostor-container prostor-container--app prostor-page">
+    <nav class="prostor-breadcrumbs">
+        <a href="{% url 'catalog:home' %}">Главная</a>
+        <span class="prostor-breadcrumbs__sep">/</span>
+        <span aria-current="page">Мои заявки</span>
+    </nav>
 
-<ul class="request-list">
-    {% for req in request_list %}
-    <li class="request-card">
-        <span class="request-card__status">{{ req.get_status_display }}</span>
-        <span class="request-card__author">{{ req.author }}</span>
-        <p>{{ req.description }}</p>
-    </li>
-    {% empty %}
-    <li>Заявок пока нет.</li>
-    {% endfor %}
-</ul>
+    <div class="prostor-heading-row">
+        <div class="prostor-section-heading">
+            <span class="prostor-section-heading__rule"></span>
+            <p class="prostor-section-heading__eyebrow">Номенклатура</p>
+            <h1 class="prostor-section-heading__title">Мои заявки</h1>
+            <p class="prostor-section-heading__description">Заявки на новые позиции и их статус в 1С.</p>
+        </div>
+        <a href="{% url 'catalog:request_create' %}" class="prostor-btn prostor-btn--primary prostor-btn--sm">Оставить новую заявку</a>
+    </div>
 
-{% if page_obj.paginator.num_pages > 1 %}
-<nav class="pagination">
-    {% if page_obj.has_previous %}
-    <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}">← Назад</a>
+    <form class="nl-toolbar" method="get" action="{% url 'catalog:request_list' %}" style="display:flex;align-items:flex-end;gap:12px;max-width:420px">
+        <div class="prostor-field" style="flex:1">
+            <label class="prostor-field__label" for="filter-status">Статус</label>
+            <select class="prostor-control" id="filter-status" name="status">
+                <option value="">Все</option>
+                {% for value, label in statuses %}
+                <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="prostor-btn prostor-btn--secondary prostor-btn--sm">Применить</button>
+    </form>
+
+    {% if request_list %}
+    <div class="prostor-table-wrap">
+        <table class="prostor-table">
+            <thead>
+                <tr>
+                    <th class="prostor-table__mono">№</th>
+                    <th>Описание</th>
+                    <th>Автор</th>
+                    <th>Статус</th>
+                    <th class="prostor-table__mono">Дата</th>
+                    <th>Комментарий</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in request_list %}
+                <tr>
+                    <td class="prostor-table__mono">{{ req.id }}</td>
+                    <td>{{ req.description }}</td>
+                    <td>{{ req.author }}</td>
+                    <td>
+                        {% if req.status == 'entered' %}
+                        <span class="prostor-badge prostor-badge--success"><span class="prostor-badge__dot"></span>{{ req.get_status_display }}</span>
+                        {% elif req.status == 'rejected' %}
+                        <span class="prostor-badge prostor-badge--danger"><span class="prostor-badge__dot"></span>{{ req.get_status_display }}</span>
+                        {% elif req.status == 'closed' %}
+                        <span class="prostor-badge prostor-badge--neutral">{{ req.get_status_display }}</span>
+                        {% else %}
+                        <span class="prostor-badge prostor-badge--info"><span class="prostor-badge__dot"></span>{{ req.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="prostor-table__mono">{{ req.created_at|date:"d.m.Y" }}</td>
+                    <td class="prostor-table__muted">{{ req.resolution_comment|default:"—" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav class="prostor-pagination">
+        {% if page_obj.has_previous %}
+        <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}">← Назад</a>
+        {% endif %}
+        <span class="prostor-pagination__status">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.next_page_number }}">Вперёд →</a>
+        {% endif %}
+    </nav>
     {% endif %}
-    <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
-    {% if page_obj.has_next %}
-    <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.next_page_number }}">Вперёд →</a>
+
+    {% else %}
+    <div class="prostor-empty">
+        <h3 class="prostor-empty__title">Заявок пока нет.</h3>
+        <p class="prostor-empty__description">Если нужной позиции нет в справочнике — оставьте заявку, конструкторы и снабжение увидят её здесь.</p>
+        <div class="prostor-empty__action">
+            <a href="{% url 'catalog:request_create' %}" class="prostor-btn prostor-btn--primary prostor-btn--sm">Оставить новую заявку</a>
+        </div>
+    </div>
     {% endif %}
-</nav>
-{% endif %}
+</div>
 {% endblock %}

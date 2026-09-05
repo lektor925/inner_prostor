@@ -1,23 +1,52 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Справочник номенклатуры{% endblock %}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700&family=Arimo:ital,wght@0,400;0,700;1,400&display=swap">
+    <link rel="stylesheet" href="{% static 'catalog/prostor.css' %}">
 </head>
 <body>
-    <nav class="site-nav">
-        <a href="{% url 'catalog:nomenclature_list' %}">Поиск</a>
-        {% if user.is_authenticated %}
-        <a href="{% url 'catalog:request_list' %}">Заявки</a>
-        <a href="{% url 'catalog:request_create' %}">Новая заявка</a>
-        <form method="post" action="{% url 'logout' %}" class="site-nav__logout">
-            {% csrf_token %}
-            <button type="submit">Выйти ({{ user }})</button>
-        </form>
-        {% else %}
-        <a href="{% url 'login' %}">Войти</a>
-        {% endif %}
-    </nav>
-    {% block content %}{% endblock %}
+    <header class="prostor-topbar prostor-topbar--sticky">
+        <div class="prostor-topbar__inner">
+            <a class="prostor-topbar__brand" href="{% url 'catalog:home' %}">
+                <span class="prostor-topbar__brand-mark"></span>PROSTOR
+            </a>
+            <nav class="prostor-topbar__nav">
+                <a href="{% url 'catalog:home' %}"{% if request.resolver_match.url_name == 'home' %} aria-current="page"{% endif %}>Главная</a>
+                <a href="{% url 'catalog:nomenclature_list' %}"{% if request.resolver_match.url_name == 'nomenclature_list' or request.resolver_match.url_name == 'nomenclature_detail' %} aria-current="page"{% endif %}>Номенклатура</a>
+                <a href="{% url 'catalog:request_list' %}"{% if request.resolver_match.url_name == 'request_list' %} aria-current="page"{% endif %}>Мои заявки</a>
+                <a href="{% url 'catalog:request_create' %}"{% if request.resolver_match.url_name == 'request_create' %} aria-current="page"{% endif %}>Новая заявка</a>
+            </nav>
+            <div class="prostor-topbar__actions">
+                {% if user.is_authenticated %}
+                <span class="prostor-topbar__user">{{ user }}</span>
+                <form method="post" action="{% url 'logout' %}" class="prostor-topbar__logout">
+                    {% csrf_token %}
+                    <button type="submit" class="prostor-btn prostor-btn--ghost prostor-btn--sm">Выйти</button>
+                </form>
+                {% else %}
+                <a href="{% url 'login' %}" class="prostor-btn prostor-btn--secondary prostor-btn--sm">Войти</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+    <main class="prostor-main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="prostor-footer">
+        <div class="prostor-footer__inner">
+            <span class="prostor-footer__brand"><span class="prostor-topbar__brand-mark"></span>PROSTOR</span>
+            <p class="prostor-footer__note">Справочник номенклатуры — внутренний портал конструктора ООО «ПРОСТОР-Л». Данные только для чтения, источник — 1С:УПП.</p>
+            <nav class="prostor-footer__nav">
+                <a href="{% url 'catalog:home' %}">Главная</a>
+                <a href="{% url 'catalog:nomenclature_list' %}">Номенклатура</a>
+                <a href="{% url 'catalog:request_list' %}">Мои заявки</a>
+            </nav>
+        </div>
+    </footer>
 </body>
 </html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700&family=Arimo:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+:root{
+--prostor-red-500:#FF0000;--prostor-red-600:#D60000;
+--prostor-grey-900:#212121;--prostor-grey-700:#55585C;--prostor-grey-500:#9E9D9F;--prostor-grey-300:#CFD2D3;--prostor-grey-200:#E4E6E7;--prostor-grey-050:#F3F5F6;--prostor-white:#FFFFFF;
+--prostor-brand:var(--prostor-red-500);--prostor-brand-hover:var(--prostor-red-600);
+--prostor-text-primary:var(--prostor-grey-700);--prostor-text-heading:var(--prostor-grey-900);--prostor-text-muted:var(--prostor-grey-500);
+--prostor-text-link:var(--prostor-grey-700);--prostor-text-link-hover:var(--prostor-red-500);
+--prostor-bg-page:var(--prostor-white);--prostor-bg-subtle:var(--prostor-grey-050);
+--prostor-border-default:var(--prostor-grey-200);
+--prostor-font-display:"Archivo Expanded",Verdana,Arial,sans-serif;
+--prostor-font-body:"Arimo",Verdana,Arial,sans-serif;
+--prostor-font-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+--prostor-font-size-xl:36px;--prostor-font-size-md:21px;--prostor-font-size-sm:15px;--prostor-font-size-xs:13px;
+--prostor-line-height-heading:1.1;
+--prostor-letter-spacing-tight:.02em;--prostor-letter-spacing-normal:.03em;
+--prostor-space-3:12px;--prostor-space-4:16px;--prostor-space-6:24px;--prostor-space-8:32px;
+--prostor-container-app:1200px;--prostor-container-gutter:20px;--prostor-header-height:80px;--prostor-rule-width:30px;
+--prostor-radius-md:10px;--prostor-z-sticky:1100;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--prostor-bg-page);color:var(--prostor-text-primary);font-family:var(--prostor-font-body);letter-spacing:var(--prostor-letter-spacing-normal)}
+a{color:var(--prostor-text-link);text-decoration:underline}
+a:hover{color:var(--prostor-text-link-hover)}
+
+.prostor-topbar{background:var(--prostor-bg-subtle);border-bottom:1px solid var(--prostor-border-default)}
+.prostor-topbar--sticky{position:sticky;top:0;z-index:var(--prostor-z-sticky)}
+.prostor-topbar__inner{display:flex;align-items:center;gap:var(--prostor-space-8);height:var(--prostor-header-height);max-width:1400px;margin-inline:auto;padding-inline:var(--prostor-container-gutter)}
+.prostor-topbar__brand{display:flex;align-items:center;flex-shrink:0;gap:10px;font-family:var(--prostor-font-display);font-weight:700;letter-spacing:.06em;color:var(--prostor-text-heading);font-size:15px}
+.prostor-topbar__brand-mark{width:18px;height:18px;background:var(--prostor-brand);flex:none}
+.prostor-topbar__nav{display:flex;align-items:center;gap:24px;font-size:var(--prostor-font-size-sm)}
+.prostor-topbar__nav a{color:var(--prostor-text-primary);text-decoration:none}
+.prostor-topbar__nav a:hover,.prostor-topbar__nav a[aria-current="page"]{color:var(--prostor-brand)}
+.prostor-topbar__actions{display:flex;align-items:center;gap:12px;margin-left:auto}
+
+.prostor-container{width:100%;margin-inline:auto;padding-inline:var(--prostor-container-gutter)}
+.prostor-container--app{max-width:var(--prostor-container-app)}
+
+.prostor-breadcrumbs{display:flex;gap:8px;align-items:center;font-size:var(--prostor-font-size-sm);color:var(--prostor-text-muted)}
+
+.prostor-section-heading{margin-bottom:var(--prostor-space-6)}
+.prostor-section-heading__rule{display:block;width:var(--prostor-rule-width);height:3px;background:var(--prostor-brand);margin-bottom:var(--prostor-space-4)}
+.prostor-section-heading__eyebrow{margin:0 0 8px;font-size:var(--prostor-font-size-xs);letter-spacing:.08em;text-transform:uppercase;color:var(--prostor-text-muted)}
+.prostor-section-heading__title{margin:0;font-family:var(--prostor-font-display);font-weight:700;font-size:var(--prostor-font-size-xl);line-height:var(--prostor-line-height-heading);letter-spacing:var(--prostor-letter-spacing-tight);color:var(--prostor-text-heading)}
+.prostor-section-heading__description{margin:var(--prostor-space-3) 0 0;color:var(--prostor-text-primary)}
+
+.prostor-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;border-radius:var(--prostor-radius-md);font-family:var(--prostor-font-body);font-size:var(--prostor-font-size-sm);cursor:pointer;padding:6px 12px}
+.prostor-btn--ghost{background:transparent;color:var(--prostor-text-primary)}
+.prostor-btn--ghost:hover{background:var(--prostor-bg-subtle)}
+
+.prostor-card{background:var(--prostor-bg-page);border:1px solid var(--prostor-border-default);border-radius:var(--prostor-radius-md);padding:var(--prostor-space-8)}
+.prostor-card__title{margin:0 0 var(--prostor-space-4);font-family:var(--prostor-font-display);font-weight:700;font-size:var(--prostor-font-size-md);color:var(--prostor-text-heading)}
+
+.prostor-table{width:100%;border-collapse:collapse;font-size:var(--prostor-font-size-sm)}
+.prostor-table thead th{background:var(--prostor-bg-subtle);color:var(--prostor-text-heading);font-family:var(--prostor-font-display);font-weight:700;text-align:start;border-bottom:2px solid var(--prostor-grey-300)}
+.prostor-table th,.prostor-table td{padding:12px 16px}
+.prostor-table tbody tr{border-bottom:1px solid var(--prostor-border-default)}
+.prostor-table__mono{font-family:var(--prostor-font-mono);font-size:.95em;color:var(--prostor-text-heading)}
+.prostor-table__end{text-align:end}
+
+.dl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 32px}
+.dl-item dt{font:700 12px var(--prostor-font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--prostor-text-muted);margin:0 0 4px}
+.dl-item dd{font:400 16px var(--prostor-font-body);color:var(--prostor-text-heading);margin:0}
+.dl-item dd.mono{font-family:var(--prostor-font-mono)}
+</style>
+</helmet>
+
+<div>
+  <div class="prostor-topbar prostor-topbar--sticky">
+    <div class="prostor-topbar__inner">
+      <span class="prostor-topbar__brand"><span class="prostor-topbar__brand-mark"></span>PROSTOR</span>
+      <nav class="prostor-topbar__nav">
+        <a href="Home.dc.html">Главная</a>
+        <a href="NomenclatureList.dc.html">Номенклатура</a>
+        <a href="RequestsList.dc.html">Мои заявки</a>
+      </nav>
+      <div class="prostor-topbar__actions">
+        <a href="Login.dc.html" class="prostor-btn prostor-btn--ghost">Выйти</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="prostor-container prostor-container--app" style="padding-top:32px;padding-bottom:64px">
+    <div class="prostor-breadcrumbs"><a href="NomenclatureList.dc.html">Номенклатура</a><span>/</span><span>12-0431</span></div>
+    <div style="height:16px"></div>
+    <div class="prostor-section-heading">
+      <span class="prostor-section-heading__rule"></span>
+      <p class="prostor-section-heading__eyebrow">Номенклатура</p>
+      <h1 class="prostor-section-heading__title">Компрессор винтовой GEA 300</h1>
+      <p class="prostor-section-heading__description">Импортировано из 1С 04.09.2026 03:00.</p>
+    </div>
+
+    <div class="prostor-card" style="margin-bottom:24px">
+      <div class="dl-grid">
+        <div class="dl-item"><dt>Код 1С</dt><dd class="mono">000000512</dd></div>
+        <div class="dl-item"><dt>Артикул</dt><dd class="mono">12-0431</dd></div>
+        <div class="dl-item"><dt>Единица измерения</dt><dd>шт</dd></div>
+        <div class="dl-item"><dt>Вид номенклатуры</dt><dd>Оборудование</dd></div>
+        <div class="dl-item"><dt>Папка</dt><dd>Холодильное оборудование / Компрессоры</dd></div>
+      </div>
+    </div>
+
+    <div class="prostor-card">
+      <p class="prostor-card__title">Остатки по складам</p>
+      <table class="prostor-table">
+        <thead>
+          <tr><th>Склад</th><th class="prostor-table__end prostor-table__mono">Остаток</th><th class="prostor-table__end prostor-table__mono">Резерв</th><th class="prostor-table__end prostor-table__mono">Доступно</th></tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{ stock }}" as="s" hint-placeholder-count="3">
+            <tr>
+              <td>{{ s.wh }}</td>
+              <td class="prostor-table__end prostor-table__mono">{{ s.qty }}</td>
+              <td class="prostor-table__end prostor-table__mono">{{ s.reserve }}</td>
+              <td class="prostor-table__end prostor-table__mono">{{ s.avail }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const STOCK = [
+  {wh:"Склад №1 (сборочный цех)", qty:2, reserve:0},
+  {wh:"Склад №2 (производство)", qty:0, reserve:0},
+  {wh:"Транзитный склад", qty:0, reserve:0},
+];
+
+class Component extends DCLogic {
+  renderVals() {
+    return { stock: STOCK.map(s => ({ ...s, avail: s.qty - s.reserve })) };
+  }
+}
+</script>
+</body>
+</html>

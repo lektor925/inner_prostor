@@ -5,3 +5,9 @@ db.sqlite3
 .env
 staticfiles/
 media/
+
+# Дизайн-исходники Claude Design: тяжёлый архив, распакованный бандл и
+# сгенерированный статический предпросмотр — держим локально, в git не кладём.
+assets/templates/*.zip
+assets/templates/_extracted_home_variants/
+assets/templates/_preview/

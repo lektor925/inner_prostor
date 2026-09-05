@@ -6,10 +6,17 @@ from django.db import connection
 from django.db.models import Prefetch, Q
 from django.http import JsonResponse
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DetailView, ListView
+from django.views.generic import CreateView, DetailView, ListView, TemplateView
 
 from .forms import RequestForm
-from .models import Folder, Nomenclature, NomenclatureKind, Request, StockBalance
+from .models import (
+    Folder,
+    ImportLog,
+    Nomenclature,
+    NomenclatureKind,
+    Request,
+    StockBalance,
+)
 
 
 def folders_by_hierarchy():
@@ -36,6 +43,31 @@ def folders_by_hierarchy():
 
     walk(None, 0)
     return result
+
+
+class HomeView(TemplateView):
+    """
+    Главный экран: крупный поиск по справочнику и иллюстрация. Первый экран
+    собран по структуре референса, оформление — дизайн-система Prostor (см.
+    catalog/static/catalog/prostor.css и прототип assets/templates/Home.dc.html).
+    В контекст отдаём только счётчик позиций и время последней синхронизации
+    для строки под поиском.
+    """
+
+    template_name = 'catalog/home.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_count'] = Nomenclature.objects.filter(is_active=True).count()
+        context['last_import'] = (
+            ImportLog.objects.filter(
+                kind=ImportLog.Kind.REFERENCE,
+                status__in=[ImportLog.Status.OK, ImportLog.Status.PARTIAL],
+            )
+            .order_by('-started_at', '-id')
+            .first()
+        )
+        return context
 
 
 class NomenclatureListView(ListView):

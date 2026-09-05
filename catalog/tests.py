@@ -7,6 +7,7 @@ from django.urls import reverse
 
 from catalog.models import (
     Folder,
+    ImportLog,
     Nomenclature,
     NomenclatureKind,
     Request,
@@ -17,6 +18,126 @@ from catalog.forms import RequestForm
 from catalog.views import NomenclatureListView, folders_by_hierarchy
 
 User = get_user_model()
+
+
+class HomeViewTests(TestCase):
+    def test_renders_hero_at_site_root(self):
+        response = self.client.get(reverse('catalog:home'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'catalog/home.html')
+        self.assertContains(response, 'Единый поиск по всей номенклатуре предприятия')
+
+    def test_nomenclature_list_moved_to_catalog_path(self):
+        self.assertEqual(reverse('catalog:home'), '/')
+        self.assertEqual(reverse('catalog:nomenclature_list'), '/catalog/')
+
+    def test_search_form_points_to_nomenclature_list(self):
+        response = self.client.get(reverse('catalog:home'))
+
+        self.assertContains(
+            response, f'action="{reverse("catalog:nomenclature_list")}"'
+        )
+
+    def test_total_count_counts_only_active(self):
+        Nomenclature.objects.create(code_1c='1', name='Активная', is_active=True)
+        Nomenclature.objects.create(code_1c='2', name='Снятая', is_active=False)
+
+        response = self.client.get(reverse('catalog:home'))
+
+        self.assertEqual(response.context['total_count'], 1)
+
+    def test_hero_shows_illustration(self):
+        response = self.client.get(reverse('catalog:home'))
+
+        self.assertContains(response, 'catalog/man.jpg')
+        self.assertContains(response, 'hm-hero__figure')
+
+    def test_renders_on_empty_catalog(self):
+        response = self.client.get(reverse('catalog:home'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['total_count'], 0)
+
+    def test_last_import_uses_latest_successful_reference_run(self):
+        old = ImportLog.objects.create(
+            kind=ImportLog.Kind.REFERENCE, source_file='old.json',
+            status=ImportLog.Status.OK,
+        )
+        newer = ImportLog.objects.create(
+            kind=ImportLog.Kind.REFERENCE, source_file='new.json',
+            status=ImportLog.Status.PARTIAL,
+        )
+        ImportLog.objects.create(
+            kind=ImportLog.Kind.REFERENCE, source_file='broken.json',
+            status=ImportLog.Status.ERROR,
+        )
+
+        response = self.client.get(reverse('catalog:home'))
+
+        self.assertEqual(response.context['last_import'], newer)
+        self.assertNotEqual(response.context['last_import'], old)
+
+    def test_sync_line_falls_back_to_started_at_when_not_finished(self):
+        ImportLog.objects.create(
+            kind=ImportLog.Kind.REFERENCE, source_file='running.json',
+            status=ImportLog.Status.OK, finished_at=None,
+        )
+
+        response = self.client.get(reverse('catalog:home'))
+
+        self.assertContains(response, 'Синхронизация с 1С —')
+        self.assertNotContains(response, 'ещё не выполнялась')
+
+
+class ChromeTests(TestCase):
+    """Общая обвязка шаблонов: верхнее меню и хлебные крошки."""
+
+    def test_top_nav_shows_all_sections_always(self):
+        response = self.client.get(reverse('catalog:home'))
+
+        for url_name in [
+            'catalog:home', 'catalog:nomenclature_list',
+            'catalog:request_list', 'catalog:request_create',
+        ]:
+            self.assertContains(response, f'href="{reverse(url_name)}"')
+
+    def test_top_nav_visible_to_anonymous(self):
+        response = self.client.get(reverse('catalog:nomenclature_list'))
+
+        self.assertContains(response, reverse('catalog:request_create'))
+        self.assertContains(response, 'Войти')
+
+    def test_breadcrumbs_on_list_page(self):
+        response = self.client.get(reverse('catalog:nomenclature_list'))
+
+        self.assertContains(response, 'prostor-breadcrumbs')
+        self.assertContains(response, f'href="{reverse("catalog:home")}"')
+
+    def test_breadcrumbs_on_detail_page(self):
+        Nomenclature.objects.create(code_1c='1', name='Болт М10')
+
+        response = self.client.get(
+            reverse('catalog:nomenclature_detail', args=['1'])
+        )
+
+        self.assertContains(response, 'prostor-breadcrumbs')
+        self.assertContains(response, f'href="{reverse("catalog:nomenclature_list")}"')
+
+    def test_prostor_stylesheet_linked(self):
+        response = self.client.get(reverse('catalog:home'))
+
+        self.assertContains(response, 'catalog/prostor.css')
+
+    def test_footer_present_on_every_page(self):
+        for url in [
+            reverse('catalog:home'),
+            reverse('catalog:nomenclature_list'),
+            reverse('login'),
+        ]:
+            response = self.client.get(url)
+            self.assertContains(response, 'prostor-footer')
+            self.assertContains(response, 'ПРОСТОР-Л')
 
 
 class NomenclatureListViewTests(TestCase):
@@ -205,7 +326,7 @@ class NomenclatureDetailViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'не актуально')
+        self.assertContains(response, 'не актуальна')
 
 
 class FoldersByHierarchyTests(TestCase):

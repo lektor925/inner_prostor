@@ -1,29 +1,81 @@
 {% extends 'catalog/base.html' %}
 
-{% block title %}Заявка на новую позицию{% endblock %}
+{% block title %}Новая заявка{% endblock %}
 
 {% block content %}
-<form class="request-form" method="post" id="request-form">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
+<div class="prostor-container prostor-container--reading prostor-page">
+    <nav class="prostor-breadcrumbs">
+        <a href="{% url 'catalog:home' %}">Главная</a>
+        <span class="prostor-breadcrumbs__sep">/</span>
+        <a href="{% url 'catalog:request_list' %}">Мои заявки</a>
+        <span class="prostor-breadcrumbs__sep">/</span>
+        <span aria-current="page">Новая заявка</span>
+    </nav>
 
-    <p>{{ form.description.label_tag }} {{ form.description }} {{ form.description.errors }}</p>
-    <p>{{ form.guessed_kind.label_tag }} {{ form.guessed_kind }} {{ form.guessed_kind.errors }}</p>
-    <p>{{ form.unit.label_tag }} {{ form.unit }} {{ form.unit.errors }}</p>
-    <p>{{ form.gost_or_article.label_tag }} {{ form.gost_or_article }} {{ form.gost_or_article.errors }}</p>
-    <p>{{ form.analog_url.label_tag }} {{ form.analog_url }} {{ form.analog_url.errors }}</p>
-
-    <div class="similar-candidates" id="similar-candidates" hidden>
-        <p>Похожие позиции уже есть в справочнике — отметьте каждую (ADR-007):</p>
-        <ul id="similar-candidates-list"></ul>
+    <div class="prostor-section-heading">
+        <span class="prostor-section-heading__rule"></span>
+        <p class="prostor-section-heading__eyebrow">Номенклатура</p>
+        <h1 class="prostor-section-heading__title">Заявка на новую позицию</h1>
+        <p class="prostor-section-heading__description">Сначала проверьте, что позиции нет в справочнике — похожие покажутся под описанием.</p>
     </div>
 
-    {{ form.shown_candidate_ids }}
-    {{ form.similar_to }}
-    <div id="reviewed-not-matching-inputs"></div>
+    <form class="request-form" method="post" id="request-form">
+        {% csrf_token %}
 
-    <button type="submit">Отправить заявку</button>
-</form>
+        {% if form.non_field_errors %}
+        <div class="prostor-alert" style="margin-bottom:20px">
+            <span class="prostor-alert__bar"></span>
+            <div><p class="prostor-alert__body">{{ form.non_field_errors|join:" " }}</p></div>
+        </div>
+        {% endif %}
+
+        <div class="prostor-formrow">
+            <label class="prostor-field__label" for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+            {{ form.description }}
+            <p class="prostor-field__hint">Опишите деталь и для какого узла она нужна.</p>
+            {% if form.description.errors %}<ul class="prostor-errorlist">{% for e in form.description.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+
+        <div class="similar-candidates" id="similar-candidates" hidden>
+            <p>Похожие позиции уже есть в справочнике — отметьте каждую (ADR-007):</p>
+            <ul id="similar-candidates-list"></ul>
+        </div>
+
+        <div class="prostor-formrow">
+            <label class="prostor-field__label" for="{{ form.guessed_kind.id_for_label }}">{{ form.guessed_kind.label }}</label>
+            {{ form.guessed_kind }}
+            {% if form.guessed_kind.errors %}<ul class="prostor-errorlist">{% for e in form.guessed_kind.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+
+        <div class="prostor-formrow">
+            <label class="prostor-field__label" for="{{ form.unit.id_for_label }}">{{ form.unit.label }}</label>
+            {{ form.unit }}
+            {% if form.unit.errors %}<ul class="prostor-errorlist">{% for e in form.unit.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+
+        <div class="prostor-formrow">
+            <label class="prostor-field__label" for="{{ form.gost_or_article.id_for_label }}">{{ form.gost_or_article.label }}</label>
+            {{ form.gost_or_article }}
+            <p class="prostor-field__hint">Необязательно.</p>
+            {% if form.gost_or_article.errors %}<ul class="prostor-errorlist">{% for e in form.gost_or_article.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+
+        <div class="prostor-formrow">
+            <label class="prostor-field__label" for="{{ form.analog_url.id_for_label }}">{{ form.analog_url.label }}</label>
+            {{ form.analog_url }}
+            <p class="prostor-field__hint">Необязательно.</p>
+            {% if form.analog_url.errors %}<ul class="prostor-errorlist">{% for e in form.analog_url.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+
+        {{ form.shown_candidate_ids }}
+        {{ form.similar_to }}
+        <div id="reviewed-not-matching-inputs"></div>
+
+        <div class="rf-actions" style="margin-top:24px">
+            <button type="submit" class="prostor-btn prostor-btn--primary">Отправить заявку</button>
+        </div>
+    </form>
+</div>
 
 <script>
 (function () {

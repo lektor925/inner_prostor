@@ -28,6 +28,20 @@ class RequestForm(forms.ModelForm):
 
     shown_candidate_ids = forms.CharField(required=False, widget=forms.HiddenInput)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Единое оформление полей дизайн-системой Prostor — служебные скрытые
+        # поля не трогаем.
+        for field in self.fields.values():
+            if isinstance(
+                field.widget, (forms.HiddenInput, forms.MultipleHiddenInput)
+            ):
+                continue
+            existing = field.widget.attrs.get('class', '')
+            field.widget.attrs['class'] = f'{existing} prostor-control'.strip()
+
+        self.fields['guessed_kind'].empty_label = 'Не определено'
+
     class Meta:
         model = Request
         fields = [
