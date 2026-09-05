@@ -47,6 +47,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # ADR-013 / спека деплоя (шаг 7): раздача статики без Nginx на MVP.
+    # WhiteNoise должен идти сразу после SecurityMiddleware.
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -150,6 +153,28 @@ LOGIN_REDIRECT_URL = 'catalog:nomenclature_list'
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Прод-раздача статики (спека деплоя, шаг 7). collectstatic складывает
+# файлы в STATIC_ROOT, WhiteNoise отдаёт их с хэшированными именами и gzip.
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+    },
+}
+
+# В проде (DEBUG=False) отдаём статику хэшированными именами + gzip через
+# WhiteNoise. В dev/тестах манифест не собран (collectstatic не запускался),
+# поэтому оставляем обычное хранилище — иначе {% static %} падает на
+# отсутствующей записи манифеста.
+if not DEBUG:
+    STORAGES['staticfiles']['BACKEND'] = (
+        'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    )
 
 
 # Email
